@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "487631191268",
+    "project_id": "proyecto-final---recuperacion",
+    "storage_bucket": "proyecto-final---recuperacion.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487631191268:android:4e504963b47b44ce5040f1",
+        "android_client_info": {
+          "package_name": "com.daniel.proyectofinal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "487631191268-kdvk0a1nees1n67hdq5sovde7p22op6k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJQtNB2SXVV-Ys0i8iLkrN5xRsrofAf5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "487631191268-kdvk0a1nees1n67hdq5sovde7p22op6k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
