@@ -20,6 +20,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
   private val usersPath = "users"
   private val recipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/recipes"
 
-  private var resultLauncherEventTarget: CustomEventTarget? = null
+  private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
 
   private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
     if (it.resultCode != Activity.RESULT_OK) return@registerForActivityResult
@@ -69,18 +70,19 @@ class MainActivity : AppCompatActivity() {
   }
 
   // Launch intent to let the the user choose a file
-  private fun selectFile(accept: String = "*/*"): CustomEventTarget? {
+  private fun selectFile(accept: String = "*/*"): CustomEventTarget<Uri>? {
     if (this.resultLauncherEventTarget != null) return null
 
-    val intent = Intent()
-    intent.type = accept
-    intent.action = Intent.ACTION_GET_CONTENT
+    val intent = Intent().apply {
+      this.type = accept
+      this.action = Intent.ACTION_GET_CONTENT
+    }
 
-    val intent2 = Intent.createChooser(intent, "Select Image from here...")
+    val intent2 = Intent.createChooser(intent, "Select File from here...")
 
     resultLauncher.launch(intent2)
 
-    val eventTarget = CustomEventTarget()
+    val eventTarget = CustomEventTarget<Uri>()
     this.resultLauncherEventTarget = eventTarget
 
     return eventTarget
@@ -94,9 +96,18 @@ class MainActivity : AppCompatActivity() {
     this.fireAuth.signOut()
   }
 
-  private fun getUser(): GoogleTask<DocumentSnapshot> {
+  private fun getUser(): CustomEventTarget<User> {
+    val userEventTarget = CustomEventTarget<User>()
+
     val userPath = "${this.usersPath}/${this.fireAuth.uid}"
-    return this.db.document(userPath).get()
+
+    this.db.document(userPath).get()
+    .addOnSuccessListener {
+      val user = it.toObject(User::class.java)
+      userEventTarget.listener(user)
+    }
+
+    return userEventTarget
   }
 
   private fun updateUser(user: User): GoogleTask<Void> {
@@ -104,8 +115,16 @@ class MainActivity : AppCompatActivity() {
     return this.db.document(userPath).set(user)
   }
 
-  private fun getRecipes(): GoogleTask<QuerySnapshot> {
-    return this.db.collection(this.recipesPath).get()
+  private fun getRecipes(): CustomEventTarget<MutableList<Recipe>> {
+    val recipesEventTarget = CustomEventTarget<MutableList<Recipe>>()
+
+    this.db.collection(this.recipesPath).get()
+    .addOnSuccessListener {
+      val recipes = it.toObjects(Recipe::class.java)
+      recipesEventTarget.listener(recipes)
+    }
+
+    return recipesEventTarget
   }
 
   private fun addRecipe(recipe: Recipe): GoogleTask<DocumentReference> {
@@ -129,17 +148,16 @@ class MainActivity : AppCompatActivity() {
   private fun changeProfileImage(user: User, image: Uri) {
     this.uploadFile(image, "images/${this.fireAuth.currentUser?.uid}")
     .setListener {
-      val file = it as Uri
-      val copyUser = user.copy(image = file.toString())
+      val copyUser = user.copy(image = it.toString())
       this.updateUser(copyUser)
     }
   }
 
-  private fun uploadFile(file: Uri, path: String): CustomEventTarget {
+  private fun uploadFile(file: Uri, path: String): CustomEventTarget<Uri> {
 
     val imageRef = this.storage.child(path)
 
-    val customEventTarget = CustomEventTarget()
+    val customEventTarget = CustomEventTarget<Uri>()
 
     imageRef
     .putFile(file)
