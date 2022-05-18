@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
   // Functions
 
   fun snackbar(message: String, duration: Int = 2000) {
