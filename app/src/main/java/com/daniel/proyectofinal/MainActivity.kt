@@ -65,12 +65,12 @@ class MainActivity : AppCompatActivity() {
 
   // Functions
 
-  private fun snackbar(message: String, duration: Int = 2000) {
+  fun snackbar(message: String, duration: Int = 2000) {
     Snackbar.make(this.binding.root, message, duration).show()
   }
 
   // Launch intent to let the the user choose a file
-  private fun selectFile(accept: String = "*/*"): CustomEventTarget<Uri>? {
+  fun selectFile(accept: String = "*/*"): CustomEventTarget<Uri>? {
     if (this.resultLauncherEventTarget != null) return null
 
     val intent = Intent().apply {
@@ -88,15 +88,15 @@ class MainActivity : AppCompatActivity() {
     return eventTarget
   }
 
-  private fun login(email: String, password: String) {
+  fun login(email: String, password: String) {
     this.fireAuth.signInWithEmailAndPassword(email, password)
   }
 
-  private fun signOut() {
+  fun signOut() {
     this.fireAuth.signOut()
   }
 
-  private fun getUser(): CustomEventTarget<User> {
+  fun getUser(): CustomEventTarget<User> {
     val userEventTarget = CustomEventTarget<User>()
 
     val userPath = "${this.usersPath}/${this.fireAuth.uid}"
@@ -110,12 +110,12 @@ class MainActivity : AppCompatActivity() {
     return userEventTarget
   }
 
-  private fun updateUser(user: User): GoogleTask<Void> {
+  fun updateUser(user: User): GoogleTask<Void> {
     val userPath = "${this.usersPath}/${user.id}"
     return this.db.document(userPath).set(user)
   }
 
-  private fun getRecipes(): CustomEventTarget<MutableList<Recipe>> {
+  fun getRecipes(): CustomEventTarget<MutableList<Recipe>> {
     val recipesEventTarget = CustomEventTarget<MutableList<Recipe>>()
 
     this.db.collection(this.recipesPath).get()
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
     return recipesEventTarget
   }
 
-  private fun addRecipe(recipe: Recipe): GoogleTask<DocumentReference> {
+  fun addRecipe(recipe: Recipe): GoogleTask<DocumentReference> {
     return this.db.collection(this.recipesPath).add(recipe)
     .addOnSuccessListener {
       val recipeCopy = recipe.copy(id = it.id)
@@ -135,17 +135,17 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun updateRecipe(recipe: Recipe): GoogleTask<Void> {
+  fun updateRecipe(recipe: Recipe): GoogleTask<Void> {
     val recipePath = "${this.recipesPath}/${recipe.id}"
     return this.db.document(recipePath).set(recipe)
   }
 
-  private fun deleteRecipe(recipe: Recipe): GoogleTask<Void> {
+  fun deleteRecipe(recipe: Recipe): GoogleTask<Void> {
     val recipePath = "${this.recipesPath}/${recipe.id}"
     return this.db.document(recipePath).delete()
   }
 
-  private fun changeProfileImage(user: User, image: Uri) {
+  fun changeProfileImage(user: User, image: Uri) {
     this.uploadFile(image, "images/${this.fireAuth.currentUser?.uid}")
     .setListener {
       val copyUser = user.copy(image = it.toString())
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun uploadFile(file: Uri, path: String): CustomEventTarget<Uri> {
+  fun uploadFile(file: Uri, path: String): CustomEventTarget<Uri> {
 
     val imageRef = this.storage.child(path)
 
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
 
   }
 
-  private fun goToFragment(fragmentInstance: Fragment) {
+  fun goToFragment(fragmentInstance: Fragment) {
     this.supportFragmentManager.beginTransaction().apply {
       this.replace(R.id.nav_host_fragment_content_main, fragmentInstance)
       this.commit()
