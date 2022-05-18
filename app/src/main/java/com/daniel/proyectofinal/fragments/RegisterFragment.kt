@@ -6,18 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.daniel.proyectofinal.MainActivity
-import com.daniel.proyectofinal.databinding.FragmentLoginBinding
+import com.daniel.proyectofinal.databinding.FragmentRegisterBinding
 
 
-class LoginFragment : Fragment() {
+class RegisterFragment : Fragment() {
 
-  private lateinit var binding: FragmentLoginBinding
+  private lateinit var binding: FragmentRegisterBinding
   private lateinit var activity: MainActivity
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     this.activity = this.getActivity() as MainActivity
 
-    this.binding = FragmentLoginBinding.inflate(layoutInflater)
+    this.binding = FragmentRegisterBinding.inflate(layoutInflater)
     return this.binding.root
   }
 

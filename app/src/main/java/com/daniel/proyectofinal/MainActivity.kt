@@ -5,24 +5,25 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import com.daniel.proyectofinal.classes.CustomEventTarget
+import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.databinding.ActivityMainBinding
-import com.daniel.proyectofinal.fragments.LoginFragment
+import com.daniel.proyectofinal.fragments.RecipesFragment
+import com.daniel.proyectofinal.fragments.RegisterFragment
 import com.daniel.proyectofinal.models.Recipe
 import com.daniel.proyectofinal.models.User
 import com.google.android.gms.tasks.Task as GoogleTask
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import java.util.*
+import kotlin.concurrent.schedule
+import kotlin.concurrent.scheduleAtFixedRate
 
 
 class MainActivity : AppCompatActivity() {
@@ -56,7 +57,10 @@ class MainActivity : AppCompatActivity() {
     this.binding = ActivityMainBinding.inflate(layoutInflater)
     this.setContentView(this.binding.root)
 
-    this.goToFragment(LoginFragment())
+    if (this.fireAuth.currentUser == null)
+      this.goToFragment(RegisterFragment())
+    else
+      this.goToFragment(RecipesFragment())
   }
 
 
@@ -69,9 +73,23 @@ class MainActivity : AppCompatActivity() {
     Snackbar.make(this.binding.root, message, duration).show()
   }
 
+  fun setTimeout(callback: () -> Any?, time: Long = 0): Timer {
+    val timer = Timer()
+    timer.schedule(time) { callback() }
+
+    return timer
+  }
+
+  fun setInterval(callback: () -> Any?, time: Long = 0): Timer {
+    val timer = Timer()
+    timer.scheduleAtFixedRate(time, time) { callback() }
+
+    return timer
+  }
+
   // Launch intent to let the the user choose a file
-  fun selectFile(accept: String = "*/*"): CustomEventTarget<Uri>? {
-    if (this.resultLauncherEventTarget != null) return null
+  fun selectFile(accept: String = "*/*"): Promise<Uri> {
+    if (this.resultLauncherEventTarget != null) return Promise.resolve(Uri.EMPTY) as Promise<Uri>
 
     val intent = Intent().apply {
       this.type = accept
@@ -85,7 +103,9 @@ class MainActivity : AppCompatActivity() {
     val eventTarget = CustomEventTarget<Uri>()
     this.resultLauncherEventTarget = eventTarget
 
-    return eventTarget
+    return Promise({ resolve, reject ->
+      eventTarget.setListener(resolve)
+    })
   }
 
   fun login(email: String, password: String) {
@@ -96,18 +116,19 @@ class MainActivity : AppCompatActivity() {
     this.fireAuth.signOut()
   }
 
-  fun getUser(): CustomEventTarget<User> {
-    val userEventTarget = CustomEventTarget<User>()
-
+  fun getUser(): Promise<User> {
     val userPath = "${this.usersPath}/${this.fireAuth.uid}"
 
-    this.db.document(userPath).get()
-    .addOnSuccessListener {
-      val user = it.toObject(User::class.java)
-      userEventTarget.listener(user)
-    }
+    return Promise({ resolve, reject ->
 
-    return userEventTarget
+      this.db.document(userPath).get()
+      .addOnSuccessListener {
+        val user = it.toObject(User::class.java)
+        resolve(user)
+      }
+      .addOnFailureListener(reject)
+
+    })
   }
 
   fun updateUser(user: User): GoogleTask<Void> {
@@ -115,16 +136,17 @@ class MainActivity : AppCompatActivity() {
     return this.db.document(userPath).set(user)
   }
 
-  fun getRecipes(): CustomEventTarget<MutableList<Recipe>> {
-    val recipesEventTarget = CustomEventTarget<MutableList<Recipe>>()
+  fun getRecipes(): Promise<MutableList<Recipe>> {
+    return Promise({ resolve, reject ->
 
-    this.db.collection(this.recipesPath).get()
-    .addOnSuccessListener {
-      val recipes = it.toObjects(Recipe::class.java)
-      recipesEventTarget.listener(recipes)
-    }
+      this.db.collection(this.recipesPath).get()
+      .addOnSuccessListener {
+        val recipes = it.toObjects(Recipe::class.java)
+        resolve(recipes)
+      }
+      .addOnFailureListener(reject)
 
-    return recipesEventTarget
+    })
   }
 
   fun addRecipe(recipe: Recipe): GoogleTask<DocumentReference> {
@@ -145,34 +167,24 @@ class MainActivity : AppCompatActivity() {
     return this.db.document(recipePath).delete()
   }
 
-  fun changeProfileImage(user: User, image: Uri) {
-    this.uploadFile(image, "images/${this.fireAuth.currentUser?.uid}")
-    .setListener {
+  fun changeProfileImage(user: User, image: Uri): Promise<Any?> {
+    return this.uploadFile(image, "images/${this.fireAuth.currentUser?.uid}")
+    .then({
       val copyUser = user.copy(image = it.toString())
       this.updateUser(copyUser)
-    }
+    })
   }
 
-  fun uploadFile(file: Uri, path: String): CustomEventTarget<Uri> {
-
+  fun uploadFile(file: Uri, path: String): Promise<Uri> {
     val imageRef = this.storage.child(path)
 
-    val customEventTarget = CustomEventTarget<Uri>()
-
-    imageRef
-    .putFile(file)
-    .addOnFailureListener() {
-      this.snackbar("There was an error uploading the file")
-      return@addOnFailureListener
-    }
-    .addOnSuccessListener {
-      imageRef.downloadUrl.addOnSuccessListener {
-        customEventTarget.listener(it)
+    return Promise({ resolve, reject ->
+      imageRef.putFile(file)
+      .addOnFailureListener(reject)
+      .addOnSuccessListener {
+        imageRef.downloadUrl.addOnSuccessListener(resolve)
       }
-    }
-
-    return customEventTarget
-
+    })
   }
 
   fun goToFragment(fragmentInstance: Fragment) {
