@@ -88,10 +88,11 @@ class Promise<T> {
 
     if (value == this) {
       this.reject(Error("Chaining cycle detected for promise #<Promise>"))
+      return
     }
 
     if (value is Promise<*>) {
-      this.then({ this.resolve(it) }, { this.reject(it) })
+      value.then({ this.resolve(it as T?) }, { this.reject(it) })
     }
     else {
       this.resolve(value)
@@ -108,7 +109,7 @@ class Promise<T> {
     }
 
     if (reason is Promise<*>) {
-      this.then({ this.resolve(it) }, { this.reject(it) })
+      reason.then({ this.resolve(it as T?) }, { this.reject(it) })
     }
     else {
       this.reject(reason)

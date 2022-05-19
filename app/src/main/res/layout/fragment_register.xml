@@ -89,10 +89,10 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/changetProfileImageBtn"
+        android:id="@+id/changeProfileImageBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Change Profile Image"
+        android:text="Select Profile Image"
         android:layout_gravity="center"
     />
 

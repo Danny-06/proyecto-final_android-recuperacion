@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun changeProfileImage(user: User, image: Uri): Promise<Any?> {
-    return this.uploadFile(image, "images/${this.fireAuth.currentUser?.uid}")
+    return this.uploadFile(image, "images/profile - ${Calendar.getInstance().timeInMillis}")
     .then({
       val copyUser = user.copy(image = it.toString())
       this.updateUser(copyUser)
