@@ -16,5 +16,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+
+        <!-- Cursor Color -->
+        <item name="android:colorControlActivated">#A574FF</item>
     </style>
 </resources>
