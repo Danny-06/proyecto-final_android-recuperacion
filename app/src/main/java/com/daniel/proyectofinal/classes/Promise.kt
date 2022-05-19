@@ -1,13 +1,10 @@
 package com.daniel.proyectofinal.classes
 
+import java.util.*
+import kotlin.concurrent.schedule
+
 
 class Promise<T> {
-
-  private enum class States {
-    PENDING,
-    FULFILLED,
-    REJECTED
-  }
 
   constructor(executor: (resolve: (T?) -> Unit, reject: (Any?) -> Unit) -> Unit) {
     try {
@@ -15,6 +12,12 @@ class Promise<T> {
     } catch (error: Error) {
       this.rejectExec(error)
     }
+  }
+
+  private enum class States {
+    PENDING,
+    FULFILLED,
+    REJECTED
   }
 
   companion object {
@@ -25,56 +28,6 @@ class Promise<T> {
     fun reject(reason: Any?): Promise<Any?> {
       return Promise({ resolve, reject -> reject(reason) })
     }
-  }
-
-  private var isResolveRejectInvoked = false
-  private var state = Promise.States.PENDING
-  private var result: Any? = Unit
-
-  private val defaultOnRejected: (Any?) -> Unit = { it }
-
-  private var thenCallbacks: MutableList<(T?) -> Any?> = mutableListOf()
-  private var catchCallbacks: MutableList<(Any?) -> Any?> = mutableListOf()
-
-  private fun resolveExec(value: T?) {
-    if (this.isResolveRejectInvoked) return
-    this.isResolveRejectInvoked = true
-
-    if (value !is Promise<*>) {
-      this.resolve(value)
-      return
-    }
-
-    if (value == this) {
-      this.reject(Error("Chaining cycle detected for promise #<Promise>"))
-    }
-    else {
-      this.then({ this.resolve(it) }, { this.reject(it) })
-    }
-  }
-
-  private fun rejectExec(reason: Any?) {
-    if (this.isResolveRejectInvoked) return
-    this.isResolveRejectInvoked = true
-
-    if (reason !is Promise<*>) {
-      this.reject(reason)
-      return
-    }
-
-    this.then({ this.resolve(it) }, { this.reject(it) })
-  }
-
-  private fun resolve(value: T?) {
-    this.state = Promise.States.FULFILLED
-    this.result = value
-    this.invokePendingThenCallbacks()
-  }
-
-  private fun reject(reason: Any?) {
-    this.state = Promise.States.REJECTED
-    this.result = reason
-    this.invokePendingCatchCallbacks()
   }
 
   fun then(onFulfilled: (T?) -> Any?, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<Any?> {
@@ -120,12 +73,77 @@ class Promise<T> {
     return Promise.resolve(this)
   }
 
-  fun invokePendingThenCallbacks() {
-    this.thenCallbacks.forEach({ it(this.result as T?) })
+  private var isResolveRejectInvoked = false
+  private var state = Promise.States.PENDING
+  private var result: Any? = Unit
+
+  private val defaultOnRejected: (Any?) -> Unit = { it }
+
+  private val thenCallbacks: MutableList<(T?) -> Any?> = mutableListOf()
+  private val catchCallbacks: MutableList<(Any?) -> Any?> = mutableListOf()
+
+  private fun resolveExec(value: T?) {
+    if (this.isResolveRejectInvoked) return
+    this.isResolveRejectInvoked = true
+
+    if (value == this) {
+      this.reject(Error("Chaining cycle detected for promise #<Promise>"))
+    }
+
+    if (value is Promise<*>) {
+      this.then({ this.resolve(it) }, { this.reject(it) })
+    }
+    else {
+      this.resolve(value)
+    }
   }
 
-  fun invokePendingCatchCallbacks() {
-    this.catchCallbacks.forEach({ it(this.result) })
+  private fun rejectExec(reason: Any?) {
+    if (this.isResolveRejectInvoked) return
+    this.isResolveRejectInvoked = true
+
+    if (reason == this) {
+      this.reject(reason)
+      return
+    }
+
+    if (reason is Promise<*>) {
+      this.then({ this.resolve(it) }, { this.reject(it) })
+    }
+    else {
+      this.reject(reason)
+    }
+  }
+
+  private fun resolve(value: T?) {
+    this.state = Promise.States.FULFILLED
+    this.result = value
+    this.invokePendingThenCallbacks()
+  }
+
+  private fun reject(reason: Any?) {
+    this.state = Promise.States.REJECTED
+    this.result = reason
+    this.invokePendingCatchCallbacks()
+  }
+
+  private fun invokePendingThenCallbacks() {
+    this.setTimeout({
+      this.thenCallbacks.forEach({ it(this.result as T?) })
+    })
+  }
+
+  private fun invokePendingCatchCallbacks() {
+    this.setTimeout({
+      this.catchCallbacks.forEach({ it(this.result) })
+    })
+  }
+
+  private fun setTimeout(callback: () -> Any?, time: Long = 0): Timer {
+    val timer = Timer()
+    timer.schedule(time) { callback() }
+
+    return timer
   }
 
 }
