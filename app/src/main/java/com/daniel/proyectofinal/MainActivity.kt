@@ -59,8 +59,6 @@ class MainActivity : AppCompatActivity() {
     this.binding = ActivityMainBinding.inflate(layoutInflater)
     this.setContentView(this.binding.root)
 
-    this.signOut()
-
 //    if (this.fireAuth.currentUser == null)
       this.goToFragment(RegisterFragment())
 //    else

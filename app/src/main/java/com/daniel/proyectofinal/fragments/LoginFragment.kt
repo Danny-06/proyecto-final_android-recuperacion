@@ -23,6 +23,29 @@ class LoginFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    this.binding.loginBtn.setOnClickListener({
+      val email    = this.binding.email.editText?.text.toString()
+      val password = this.binding.password.editText?.text.toString()
+
+      if (email.isEmpty()) {
+        this.activity.snackbar("Email field cannot be empty.")
+        return@setOnClickListener
+      }
+
+      if (password.isEmpty()) {
+        this.activity.snackbar("Password field cannot be empty.")
+        return@setOnClickListener
+      }
+
+      this.activity.login(email, password)
+      .addOnFailureListener {
+        this.activity.snackbar("There was an error when trying to login the account. Check if the email provided is valid.", 4000)
+      }
+      .addOnSuccessListener {
+        this.activity.goToFragment(RecipesFragment())
+      }
+    })
   }
 
 }
