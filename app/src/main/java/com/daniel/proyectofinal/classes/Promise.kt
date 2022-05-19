@@ -129,15 +129,15 @@ class Promise<T> {
   }
 
   private fun invokePendingThenCallbacks() {
-    this.setTimeout({
+//    this.setTimeout({
       this.thenCallbacks.forEach({ it(this.result as T?) })
-    })
+//    })
   }
 
   private fun invokePendingCatchCallbacks() {
-    this.setTimeout({
+//    this.setTimeout({
       this.catchCallbacks.forEach({ it(this.result) })
-    })
+//    })
   }
 
   private fun setTimeout(callback: () -> Any?, time: Long = 0): Timer {
