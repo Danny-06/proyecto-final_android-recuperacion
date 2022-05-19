@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
   private val storage = FirebaseStorage.getInstance().reference
 
   private val usersPath = "users"
+  private val userPath get() = "${this.usersPath}/${this.fireAuth.uid}"
   private val recipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/recipes"
 
   private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
@@ -116,11 +117,9 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun getUser(): Promise<User> {
-    val userPath = "${this.usersPath}/${this.fireAuth.uid}"
-
     return Promise({ resolve, reject ->
 
-      this.db.document(userPath).get()
+      this.db.document(this.userPath).get()
       .addOnSuccessListener {
         val user = it.toObject(User::class.java)
         resolve(user)
