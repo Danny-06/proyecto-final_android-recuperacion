@@ -9,7 +9,10 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="MainActivityBG">#222</color>
+
     <color name="input_color">#FFF</color>
     <color name="input_placeholder_color">#AAA</color>
+    <color name="input_placeholder_float_color">#A574FF</color>
+    <color name="input_box_stroke_color">#A574FF</color>
     <color name="input_bg_color">#444</color>
 </resources>
