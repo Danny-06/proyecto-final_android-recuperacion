@@ -32,6 +32,7 @@ class RegisterFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     this.binding.changeProfileImageBtn.setOnClickListener({
+
       this.activity.selectFile("image/*")
       .then({ fileSystemUri ->
         if (fileSystemUri == null) return@then Promise.reject(null)
@@ -42,21 +43,29 @@ class RegisterFragment : Fragment() {
         this.userImage = imgUri.toString()
         Picasso.get().load(this.userImage).into(this.binding.profileImage)
       })
+
     })
 
     this.binding.registerBtn.setOnClickListener({
-      val userName = this.binding.userName.editText?.text.toString()
-      val email    = this.binding.email.editText?.text.toString()
+      val userName = this.binding.userName.editText?.text.toString().trim()
+      val email    = this.binding.email.editText?.text.toString().trim()
       val password = this.binding.password.editText?.text.toString()
 
       this.activity.register(email, password)
+      .addOnFailureListener {
+        this.activity.snackbar("There was an error when trying to register the account. Try again later", 4000)
+      }
       .addOnSuccessListener {
         val uid = this.activity.fireAuth.currentUser?.uid.toString()
         val user = User(uid, userName, this.userImage)
+
         this.activity.addUser(user)
-      }
-      .addOnFailureListener {
-        this.activity.snackbar("There was an error when trying to register the account. Try again later", 4000)
+        .addOnFailureListener {
+          this.activity.snackbar("There was an error. Try again later.")
+        }
+        .addOnSuccessListener {
+          this.activity.goToFragment(RecipesFragment())
+        }
       }
     })
   }
