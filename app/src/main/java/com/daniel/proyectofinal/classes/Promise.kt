@@ -21,11 +21,11 @@ class Promise<T> {
   }
 
   companion object {
-    fun resolve(value: Any?): Promise<Any?> {
+    fun resolve(value: Any? = Unit): Promise<Any?> {
       return Promise({ resolve, reject -> resolve(value) })
     }
 
-    fun reject(reason: Any?): Promise<Any?> {
+    fun reject(reason: Any? = Unit): Promise<Any?> {
       return Promise({ resolve, reject -> reject(reason) })
     }
   }

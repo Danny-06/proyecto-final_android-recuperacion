@@ -6,7 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.daniel.proyectofinal.MainActivity
+import com.daniel.proyectofinal.R
+import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.databinding.FragmentRegisterBinding
+import com.daniel.proyectofinal.models.User
 import com.squareup.picasso.Picasso
 import java.util.*
 
@@ -30,15 +33,31 @@ class RegisterFragment : Fragment() {
 
     this.binding.changeProfileImageBtn.setOnClickListener({
       this.activity.selectFile("image/*")
-      .then({
-        if (it == null) return@then null
+      .then({ fileSystemUri ->
+        if (fileSystemUri == null) return@then Promise.reject(null)
 
-        this.activity.uploadFile(it, "images/profile - ${Calendar.getInstance().timeInMillis}")
+        this.activity.uploadFile(fileSystemUri, "images/profile - ${Calendar.getInstance().timeInMillis}")
       })
-      .then({
-        this.userImage = it.toString()
+      .then({ imgUri ->
+        this.userImage = imgUri.toString()
         Picasso.get().load(this.userImage).into(this.binding.profileImage)
       })
+    })
+
+    this.binding.registerBtn.setOnClickListener({
+      val userName = this.binding.userName.editText?.text.toString()
+      val email    = this.binding.email.editText?.text.toString()
+      val password = this.binding.password.editText?.text.toString()
+
+      this.activity.register(email, password)
+      .addOnSuccessListener {
+        val uid = this.activity.fireAuth.currentUser?.uid.toString()
+        val user = User(uid, userName, this.userImage)
+        this.activity.addUser(user)
+      }
+      .addOnFailureListener {
+        this.activity.snackbar("There was an error when trying to register the account. Try again later", 4000)
+      }
     })
   }
 

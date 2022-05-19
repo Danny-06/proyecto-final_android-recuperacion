@@ -16,6 +16,7 @@ import com.daniel.proyectofinal.models.Recipe
 import com.daniel.proyectofinal.models.User
 import com.google.android.gms.tasks.Task as GoogleTask
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
@@ -29,9 +30,9 @@ import kotlin.concurrent.scheduleAtFixedRate
 class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
-  private val fireAuth = Firebase.auth
-  private val db = Firebase.firestore
-  private val storage = FirebaseStorage.getInstance().reference
+  val fireAuth = Firebase.auth
+  val db = Firebase.firestore
+  val storage = FirebaseStorage.getInstance().reference
 
   private val usersPath = "users"
   private val userPath get() = "${this.usersPath}/${this.fireAuth.uid}"
@@ -58,10 +59,12 @@ class MainActivity : AppCompatActivity() {
     this.binding = ActivityMainBinding.inflate(layoutInflater)
     this.setContentView(this.binding.root)
 
-    if (this.fireAuth.currentUser == null)
+    this.signOut()
+
+//    if (this.fireAuth.currentUser == null)
       this.goToFragment(RegisterFragment())
-    else
-      this.goToFragment(RecipesFragment())
+//    else
+//      this.goToFragment(RecipesFragment())
   }
 
 
@@ -108,8 +111,12 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
-  fun login(email: String, password: String) {
-    this.fireAuth.signInWithEmailAndPassword(email, password)
+  fun register(email: String, password: String): GoogleTask<AuthResult> {
+    return this.fireAuth.createUserWithEmailAndPassword(email, password)
+  }
+
+  fun login(email: String, password: String): GoogleTask<AuthResult> {
+    return this.fireAuth.signInWithEmailAndPassword(email, password)
   }
 
   fun signOut() {
@@ -127,6 +134,10 @@ class MainActivity : AppCompatActivity() {
       .addOnFailureListener(reject)
 
     })
+  }
+
+  fun addUser(user: User): GoogleTask<Void> {
+    return this.updateUser(user)
   }
 
   fun updateUser(user: User): GoogleTask<Void> {
