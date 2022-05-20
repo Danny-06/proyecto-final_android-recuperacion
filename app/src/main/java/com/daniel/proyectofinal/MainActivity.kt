@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
   private val usersPath = "users"
   private val userPath get() = "${this.usersPath}/${this.fireAuth.uid}"
-  private val recipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/recipes"
+  private val userRecipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/recipes"
 
   private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
 
@@ -59,10 +59,10 @@ class MainActivity : AppCompatActivity() {
     this.binding = ActivityMainBinding.inflate(layoutInflater)
     this.setContentView(this.binding.root)
 
-//    if (this.fireAuth.currentUser == null)
+    if (this.fireAuth.currentUser == null)
       this.goToFragment(RegisterFragment())
-//    else
-//      this.goToFragment(RecipesFragment())
+    else
+      this.goToFragment(RecipesFragment())
   }
 
 
@@ -134,6 +134,19 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
+  fun getUsers(): Promise<MutableList<User>> {
+    return Promise({ resolve, reject ->
+
+      this.db.collection(this.usersPath).get()
+      .addOnFailureListener(reject)
+      .addOnSuccessListener {
+        val users = it.toObjects(User::class.java)
+        resolve(users)
+      }
+
+    })
+  }
+
   fun addUser(user: User): GoogleTask<Void> {
     return this.updateUser(user)
   }
@@ -144,9 +157,13 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun getRecipes(): Promise<MutableList<Recipe>> {
+    return this.getRecipes(this.userRecipesPath)
+  }
+
+  fun getRecipes(path: String): Promise<MutableList<Recipe>> {
     return Promise({ resolve, reject ->
 
-      this.db.collection(this.recipesPath).get()
+      this.db.collection(path).get()
       .addOnSuccessListener {
         val recipes = it.toObjects(Recipe::class.java)
         resolve(recipes)
@@ -156,8 +173,33 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
+  // Recipes from all of the users
+  fun getAllRecipes(): Promise<MutableList<Recipe>> {
+    return Promise({ resolve, reject ->
+
+      var userRecipeCounter = 0
+      val recipes: MutableList<Recipe> = mutableListOf()
+
+      this.getUsers()
+      .then({ users ->
+
+        users!!.forEach { user ->
+          this.getRecipes("${this.usersPath}/${user.id}/recipes")
+          .then({ userRecipes ->
+            recipes.addAll(userRecipes as Collection<Recipe>)
+            userRecipeCounter++
+
+            if (userRecipeCounter == users.size) resolve(recipes)
+          })
+        }
+
+      })
+
+    })
+  }
+
   fun addRecipe(recipe: Recipe): GoogleTask<DocumentReference> {
-    return this.db.collection(this.recipesPath).add(recipe)
+    return this.db.collection(this.userRecipesPath).add(recipe)
     .addOnSuccessListener {
       val recipeCopy = recipe.copy(id = it.id)
       this.updateRecipe(recipeCopy)
@@ -165,12 +207,12 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun updateRecipe(recipe: Recipe): GoogleTask<Void> {
-    val recipePath = "${this.recipesPath}/${recipe.id}"
+    val recipePath = "${this.userRecipesPath}/${recipe.id}"
     return this.db.document(recipePath).set(recipe)
   }
 
   fun deleteRecipe(recipe: Recipe): GoogleTask<Void> {
-    val recipePath = "${this.recipesPath}/${recipe.id}"
+    val recipePath = "${this.userRecipesPath}/${recipe.id}"
     return this.db.document(recipePath).delete()
   }
 

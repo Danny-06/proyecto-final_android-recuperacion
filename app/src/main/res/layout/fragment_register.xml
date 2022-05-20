@@ -15,14 +15,14 @@
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="75dp"
+        app:cardCornerRadius="60dp"
         android:layout_gravity="center"
     >
 
         <ImageView
             android:id="@+id/profileImage"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:scaleType="centerCrop"
             android:src="@drawable/user_placeholder"
         />
@@ -106,6 +106,16 @@
         android:text="Register"
         android:layout_gravity="center"
         android:backgroundTint="@color/button_register_color"
+    />
+
+    <TextView
+        android:id="@+id/goToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go to login"
+        android:textSize="20sp"
+        android:textColor="#3CA6FF"
+        android:layout_gravity="center"
     />
 
 </LinearLayout>

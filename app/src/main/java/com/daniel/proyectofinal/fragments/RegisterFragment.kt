@@ -33,58 +33,69 @@ class RegisterFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     this.binding.changeProfileImageBtn.setOnClickListener({
-
-      this.activity.selectFile("image/*")
-      .then({ fileSystemUri ->
-        if (fileSystemUri == null) return@then Promise.reject(null)
-
-        this.activity.uploadFile(fileSystemUri, "images/profile - ${Calendar.getInstance().timeInMillis}")
-      })
-      .then({ imgUri ->
-        this.userImage = imgUri.toString()
-        Picasso.get().load(this.userImage).into(this.binding.profileImage)
-      })
-
+      this.selectProfileImage()
     })
 
     this.binding.registerBtn.setOnClickListener({
-      val userName = this.binding.userName.editText?.text.toString().trim()
-      val email    = this.binding.email.editText?.text.toString().trim()
-      val password = this.binding.password.editText?.text.toString()
+      this.register()
+    })
 
-      if (userName.isEmpty()) {
-        this.activity.snackbar("Username field cannot be empty.")
-        return@setOnClickListener
-      }
+    this.binding.goToLogin.setOnClickListener({
+      this.activity.goToFragment(LoginFragment())
+    })
+  }
 
-      if (email.isEmpty()) {
-        this.activity.snackbar("Email field cannot be empty.")
-        return@setOnClickListener
-      }
+  // Functions
 
-      if (password.isEmpty()) {
-        this.activity.snackbar("Password field cannot be empty.")
-        return@setOnClickListener
-      }
+  fun selectProfileImage() {
+    this.activity.selectFile("image/*")
+    .then({ fileSystemUri ->
+      if (fileSystemUri == null) return@then Promise.reject(null)
 
-      this.activity.register(email, password)
+      this.activity.uploadFile(fileSystemUri, "images/profile - ${Calendar.getInstance().timeInMillis}")
+    })
+    .then({ imgUri ->
+      this.userImage = imgUri.toString()
+      Picasso.get().load(this.userImage).into(this.binding.profileImage)
+    })
+  }
+
+  fun register() {
+    val userName = this.binding.userName.editText?.text.toString().trim()
+    val email    = this.binding.email.editText?.text.toString().trim()
+    val password = this.binding.password.editText?.text.toString()
+
+    if (userName.isEmpty()) {
+      this.activity.snackbar("Username field cannot be empty.")
+      return
+    }
+
+    if (email.isEmpty()) {
+      this.activity.snackbar("Email field cannot be empty.")
+      return
+    }
+
+    if (password.isEmpty()) {
+      this.activity.snackbar("Password field cannot be empty.")
+      return
+    }
+
+    this.activity.register(email, password)
+    .addOnFailureListener {
+      this.activity.snackbar("There was an error when trying to register the account. Check if the email provided is valid.", 4000)
+    }
+    .addOnSuccessListener {
+      val uid = this.activity.fireAuth.currentUser?.uid.toString()
+      val user = User(uid, userName, this.userImage)
+
+      this.activity.addUser(user)
       .addOnFailureListener {
-        this.activity.snackbar("There was an error when trying to register the account. Check if the email provided is valid.", 4000)
+        this.activity.snackbar("There was an error. Try again later.")
       }
       .addOnSuccessListener {
-        val uid = this.activity.fireAuth.currentUser?.uid.toString()
-        val user = User(uid, userName, this.userImage)
-
-        this.activity.addUser(user)
-        .addOnFailureListener {
-          this.activity.snackbar("There was an error. Try again later.")
-        }
-        .addOnSuccessListener {
-          this.activity.goToFragment(RecipesFragment())
-        }
+        this.activity.goToFragment(RecipesFragment())
       }
-    }) // this.binding.registerBtn.setOnClickListener
-
+    }
   }
 
 }

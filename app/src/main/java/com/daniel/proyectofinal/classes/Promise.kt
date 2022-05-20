@@ -44,8 +44,8 @@ class Promise<T> {
             reject(this.result)
           }
           else {
-            val reason = onRejected(this.result)
-            resolve(reason)
+            val value = onRejected(this.result)
+            resolve(value)
           }
         }
 
