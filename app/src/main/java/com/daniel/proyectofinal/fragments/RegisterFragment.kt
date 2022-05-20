@@ -93,7 +93,7 @@ class RegisterFragment : Fragment() {
         this.activity.snackbar("There was an error. Try again later.")
       }
       .addOnSuccessListener {
-        this.activity.goToFragment(RecipesFragment())
+        this.activity.onRegisterOrLogin()
       }
     }
   }

@@ -5,11 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.daniel.proyectofinal.classes.CustomEventTarget
 import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.databinding.ActivityMainBinding
+import com.daniel.proyectofinal.databinding.ToolbarBinding
+import com.daniel.proyectofinal.fragments.LoginFragment
 import com.daniel.proyectofinal.fragments.RecipesFragment
 import com.daniel.proyectofinal.fragments.RegisterFragment
 import com.daniel.proyectofinal.models.Recipe
@@ -22,6 +26,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.concurrent.scheduleAtFixedRate
@@ -30,6 +35,8 @@ import kotlin.concurrent.scheduleAtFixedRate
 class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
+  private lateinit var toolbar: ToolbarBinding
+
   val fireAuth = Firebase.auth
   val db = Firebase.firestore
   val storage = FirebaseStorage.getInstance().reference
@@ -58,6 +65,8 @@ class MainActivity : AppCompatActivity() {
 
     this.binding = ActivityMainBinding.inflate(layoutInflater)
     this.setContentView(this.binding.root)
+
+    this.toolbar = this.binding.toolbar
 
     if (this.fireAuth.currentUser == null)
       this.goToFragment(RegisterFragment())
@@ -119,17 +128,35 @@ class MainActivity : AppCompatActivity() {
 
   fun signOut() {
     this.fireAuth.signOut()
+    this.goToFragment(LoginFragment())
+  }
+
+  fun onRegisterOrLogin() {
+    this.goToFragment(RecipesFragment())
+    this.toolbar.profileImageParent.isVisible = true
+
+    this.getUser()
+    .then({ user ->
+      this.toolbar.profileImageParent.visibility = View.VISIBLE
+      Picasso.get().load(user!!.image).into(this.toolbar.profileImage)
+    })
+  }
+
+  fun onSignOut() {
+    this.signOut()
+    this.goToFragment(LoginFragment())
+    this.toolbar.profileImageParent.visibility = View.INVISIBLE
   }
 
   fun getUser(): Promise<User> {
     return Promise({ resolve, reject ->
 
       this.db.document(this.userPath).get()
+      .addOnFailureListener(reject)
       .addOnSuccessListener {
         val user = it.toObject(User::class.java)
         resolve(user)
       }
-      .addOnFailureListener(reject)
 
     })
   }
@@ -164,11 +191,11 @@ class MainActivity : AppCompatActivity() {
     return Promise({ resolve, reject ->
 
       this.db.collection(path).get()
+      .addOnFailureListener(reject)
       .addOnSuccessListener {
         val recipes = it.toObjects(Recipe::class.java)
         resolve(recipes)
       }
-      .addOnFailureListener(reject)
 
     })
   }

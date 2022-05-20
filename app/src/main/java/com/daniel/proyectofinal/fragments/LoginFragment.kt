@@ -54,7 +54,7 @@ class LoginFragment : Fragment() {
       this.activity.snackbar("There was an error when trying to login the account. Check if the email provided is valid.", 4000)
     }
     .addOnSuccessListener {
-      this.activity.goToFragment(RecipesFragment())
+      this.activity.onRegisterOrLogin()
     }
   }
 
