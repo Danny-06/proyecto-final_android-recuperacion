@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity() {
 
     this.toolbar = this.binding.toolbar
 
+    // Check if user is logged in the application
     if (this.fireAuth.currentUser == null)
       this.goToFragment(RegisterFragment())
     else

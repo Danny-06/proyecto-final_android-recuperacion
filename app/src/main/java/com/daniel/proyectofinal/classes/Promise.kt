@@ -35,6 +35,9 @@ class Promise<T> {
     if (this.state != Promise.States.PENDING)
       return Promise({ resolve, reject ->
 
+        val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any?, reject)
+        val onRejectedWrapper  = this.cW(onRejected, reject)
+
         if (this.state == Promise.States.FULFILLED) {
           val value = onFulfilled(this.result as T?)
           resolve(value)
@@ -44,7 +47,7 @@ class Promise<T> {
             reject(this.result)
           }
           else {
-            val value = onRejected(this.result)
+            val value = onRejectedWrapper(this.result)
             resolve(value)
           }
         }
@@ -52,12 +55,15 @@ class Promise<T> {
       })
 
     return Promise({ resolve, reject ->
-      this.thenCallbacks.add({ resolve(onFulfilled(it)) })
+      val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any?, reject)
+      val onRejectedWrapper  = this.cW(onRejected, reject)
+
+      this.thenCallbacks.add({ resolve(onFulfilledWrapper(it)) })
 
       if (onRejected == this.defaultOnRejected) {
         this.catchCallbacks.add({ reject(it) })
       } else {
-        this.catchCallbacks.add({ resolve(onRejected(it)) })
+        this.catchCallbacks.add({ resolve(onRejectedWrapper(it)) })
       }
     })
 
@@ -81,6 +87,19 @@ class Promise<T> {
 
   private val thenCallbacks: MutableList<(T?) -> Any?> = mutableListOf()
   private val catchCallbacks: MutableList<(Any?) -> Any?> = mutableListOf()
+
+
+  private fun cW(callback: (Any?) -> Any?, reject: (Any?) -> Unit): (Any?) -> Any? {
+    return fun(data: Any?): Any? {
+      try {
+        return callback(data)
+      } catch (error: Error) {
+        reject(error)
+      }
+
+      return Unit
+    }
+  }
 
   private fun resolveExec(value: T?) {
     if (this.isResolveRejectInvoked) return
@@ -130,7 +149,13 @@ class Promise<T> {
 
   private fun invokePendingThenCallbacks() {
 //    this.setTimeout({
-    this.thenCallbacks.forEach({ it(this.result as T?) })
+    this.thenCallbacks.forEach({
+      try {
+        it(this.result as T?)
+      } catch (error: Error) {
+        this.reject(error)
+      }
+    })
 //    })
   }
 
