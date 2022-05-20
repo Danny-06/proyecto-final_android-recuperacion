@@ -2,10 +2,10 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".fragments.RecipesFragment"
+    tools:background="@color/MainActivityBG"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.RecipesFragment"
-    android:background="@color/MainActivityBG"
     android:orientation="vertical"
 >
 

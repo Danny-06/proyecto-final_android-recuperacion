@@ -130,13 +130,13 @@ class Promise<T> {
 
   private fun invokePendingThenCallbacks() {
 //    this.setTimeout({
-      this.thenCallbacks.forEach({ it(this.result as T?) })
+    this.thenCallbacks.forEach({ it(this.result as T?) })
 //    })
   }
 
   private fun invokePendingCatchCallbacks() {
 //    this.setTimeout({
-      this.catchCallbacks.forEach({ it(this.result) })
+    this.catchCallbacks.forEach({ it(this.result) })
 //    })
   }
 

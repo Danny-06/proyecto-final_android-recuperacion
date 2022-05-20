@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.add
 import com.daniel.proyectofinal.classes.CustomEventTarget
 import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.databinding.ActivityMainBinding
@@ -48,11 +49,9 @@ class MainActivity : AppCompatActivity() {
   private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
 
   private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
-    if (it.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+    if (it.resultCode == Activity.RESULT_OK) {
+      val activityResult = it
 
-    val activityResult = it
-
-    if (activityResult.resultCode == Activity.RESULT_OK) {
       val data = activityResult.data?.data
       this.resultLauncherEventTarget?.listener?.invoke(data)
     }
@@ -99,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
   // Launch intent to let the the user choose a file
   fun selectFile(accept: String = "*/*"): Promise<Uri> {
-    if (this.resultLauncherEventTarget != null) return Promise.resolve(Uri.EMPTY) as Promise<Uri>
+    if (this.resultLauncherEventTarget != null) return Promise.reject() as Promise<Uri>
 
     val intent = Intent().apply {
       this.type = accept
@@ -263,11 +262,12 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
-  fun goToFragment(fragmentInstance: Fragment) {
-    this.supportFragmentManager.beginTransaction().apply {
-      this.replace(R.id.nav_host_fragment_content_main, fragmentInstance)
-      this.commit()
-    }
+  fun goToFragment(fragment: Fragment, bundle: Bundle? = null) {
+    fragment.arguments = bundle
+
+    this.supportFragmentManager.beginTransaction()
+    .replace(R.id.nav_host_fragment_content_main, fragment)
+    .commit()
   }
 
 }

@@ -36,7 +36,7 @@ class LoginFragment : Fragment() {
   // Functions
 
   fun login() {
-    val email    = this.binding.email.editText?.text.toString()
+    val email    = this.binding.email.editText?.text.toString().trim()
     val password = this.binding.password.editText?.text.toString()
 
     if (email.isEmpty()) {
