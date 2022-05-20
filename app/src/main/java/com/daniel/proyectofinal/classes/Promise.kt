@@ -39,7 +39,7 @@ class Promise<T> {
         val onRejectedWrapper  = this.cW(onRejected, reject)
 
         if (this.state == Promise.States.FULFILLED) {
-          val value = onFulfilled(this.result as T?)
+          val value = onFulfilledWrapper(this.result as T?)
           resolve(value)
         }
         else {
