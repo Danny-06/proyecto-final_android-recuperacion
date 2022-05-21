@@ -32,13 +32,13 @@ class Promise<T> {
     }
   }
 
-  fun then(onFulfilled: (T?) -> Any?, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<Any?> {
+  fun <S>then(onFulfilled: (T?) -> S?, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<S?> {
 
     if (this.state != Promise.States.PENDING)
       return Promise({ resolve, reject ->
 
         val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any?, reject)
-        val onRejectedWrapper  = this.cW(onRejected, reject)
+        val onRejectedWrapper  = this.cW(onRejected as (Any?) -> Any?, reject)
 
         if (this.state == Promise.States.FULFILLED) {
           val value = onFulfilledWrapper(this.result as T?)
@@ -58,7 +58,7 @@ class Promise<T> {
 
     return Promise({ resolve, reject ->
       val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any?, reject)
-      val onRejectedWrapper  = this.cW(onRejected, reject)
+      val onRejectedWrapper  = this.cW(onRejected as (Any?) -> Any?, reject)
 
       this.thenCallbacks.add({ resolve(onFulfilledWrapper(it)) })
 
@@ -71,21 +71,21 @@ class Promise<T> {
 
   }
 
-  fun catch(onRejected: (Any?) -> Any?): Promise<Any?> {
-    return this.then({ it }, onRejected)
+  fun <S>catch(onRejected: (Any?) -> S?): Promise<S?> {
+    return this.then({ } as (Any?) -> S?, onRejected)
   }
 
-  fun finally(onFinally: (Any?) -> Any?): Promise<Any?> {
-    this.then(onFinally, onFinally)
+  fun finally(onFinally: () -> Unit): Promise<T?> {
+    this.then<T>(onFinally as (T?) -> T?, onFinally as (Any?) -> T?)
 
-    return Promise.resolve(this)
+    return Promise.resolve(this) as Promise<T?>
   }
 
   private var isResolveRejectInvoked = false
   private var state = Promise.States.PENDING
   private var result: Any? = Unit
 
-  private val defaultOnRejected: (Any?) -> Unit = { it }
+  private val defaultOnRejected: (Any?) -> Any? = { }
 
   private val thenCallbacks: MutableList<(T?) -> Any?> = mutableListOf()
   private val catchCallbacks: MutableList<(Any?) -> Any?> = mutableListOf()
@@ -104,20 +104,32 @@ class Promise<T> {
     }
   }
 
-  private fun resolveExec(value: T?) {
+  private fun resolveExec(value: Promise<T?>) {
     if (this.isResolveRejectInvoked) return
     this.isResolveRejectInvoked = true
 
     if (value == this) {
-      this.reject(Error("Chaining cycle detected for promise #<Promise>"))
-      return
+      this.reject(Exception("Chaining cycle detected for promise #<Promise>"))
+    } else {
+      value.then({ this.resolve(it) }, { this.reject(it) })
     }
+  }
 
-    if (value is Promise<*>) {
-      value.then({ this.resolve(it as T?) }, { this.reject(it) })
-    }
-    else {
-      this.resolve(value)
+  private fun resolveExec(value: T?) {
+    if (this.isResolveRejectInvoked) return
+    this.isResolveRejectInvoked = true
+
+    this.resolve(value)
+  }
+
+  private fun rejecExec(reason: Promise<Any?>) {
+    if (this.isResolveRejectInvoked) return
+    this.isResolveRejectInvoked = true
+
+    if (reason == this) {
+      this.reject(reason)
+    } else {
+      reason.then({ this.resolve(it as T?) }, { this.reject(it) })
     }
   }
 
@@ -125,17 +137,7 @@ class Promise<T> {
     if (this.isResolveRejectInvoked) return
     this.isResolveRejectInvoked = true
 
-    if (reason == this) {
-      this.reject(reason)
-      return
-    }
-
-    if (reason is Promise<*>) {
-      reason.then({ this.resolve(it as T?) }, { this.reject(it) })
-    }
-    else {
-      this.reject(reason)
-    }
+    this.reject(reason)
   }
 
   private fun resolve(value: T?) {
