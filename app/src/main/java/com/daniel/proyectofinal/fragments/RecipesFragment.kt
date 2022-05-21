@@ -24,9 +24,7 @@ class RecipesFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    this.binding.logout.setOnClickListener {
-      this.activity.onSignOut()
-    }
+
   }
 
 }

@@ -1,27 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".fragments.RecipesFragment"
     tools:background="@color/MainActivityBG"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
 >
 
-    <TextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+    >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recipes"
+            android:layout_gravity="center"
+            android:textSize="40sp"
+            android:layout_marginVertical="20dp"
+        />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recipesRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+        />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addRecipe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Recipes Fragment"
-        android:layout_gravity="center"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_baseline_add_24"
     />
 
-    <Button
-        android:id="@+id/logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Log out"
-        android:layout_gravity="center"
-    />
-
-</LinearLayout>
+</FrameLayout>
