@@ -46,12 +46,10 @@ class MainActivity : AppCompatActivity() {
   private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
 
   private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
-    if (it.resultCode == Activity.RESULT_OK) {
-      val activityResult = it
+    val activityResult = it
 
-      val data = activityResult.data?.data
-      this.resultLauncherEventTarget?.listener?.invoke(data)
-    }
+    val data = activityResult.data?.data
+    this.resultLauncherEventTarget?.listener?.invoke(data)
 
     this.resultLauncherEventTarget = null
   }
@@ -97,7 +95,10 @@ class MainActivity : AppCompatActivity() {
     this.resultLauncherEventTarget = eventTarget
 
     return Promise({ resolve, reject ->
-      eventTarget.setListener(resolve)
+      eventTarget.setListener({
+        if (it != null) resolve(it)
+        else            reject(Exception("No File Selected"))
+      })
     })
   }
 

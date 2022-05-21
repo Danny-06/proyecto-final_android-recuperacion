@@ -83,11 +83,11 @@ class Promise<T> {
     return this.catch(onRejected as (Any?) -> S)
   }
 
-//  fun finally(onFinally: () -> Unit): Promise<T> {
-//    this.then<T>(onFinally as (T) -> T, onFinally as (Any?) -> T)
-//
-//    return Promise.resolve(this) as Promise<T>
-//  }
+  fun finally(onFinally: () -> Unit): Promise<T> {
+    this.then({ onFinally() }, { onFinally() })
+
+    return Promise.resolve(this) as Promise<T>
+  }
 
   private var isResolveRejectInvoked = false
   private var state = Promise.States.PENDING
