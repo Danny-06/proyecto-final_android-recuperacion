@@ -5,11 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.add
 import com.daniel.proyectofinal.classes.CustomEventTarget
 import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.databinding.ActivityMainBinding
@@ -83,11 +84,11 @@ class MainActivity : AppCompatActivity() {
     Snackbar.make(this.binding.root, message, duration).show()
   }
 
-  fun setTimeout(callback: () -> Any?, time: Long = 0): Timer {
-    val timer = Timer()
-    timer.schedule(time) { callback() }
+  fun setTimeout(callback: () -> Any?, time: Long = 0) {
+    val handler = Handler(Looper.getMainLooper())
+    val runnable = Runnable({ callback() })
 
-    return timer
+    handler.postDelayed(runnable, time)
   }
 
   fun setInterval(callback: () -> Any?, time: Long = 0): Timer {

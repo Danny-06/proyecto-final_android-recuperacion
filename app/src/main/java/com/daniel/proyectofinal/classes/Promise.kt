@@ -1,5 +1,7 @@
 package com.daniel.proyectofinal.classes
 
+import android.os.Handler
+import android.os.Looper
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -89,11 +91,12 @@ class Promise<T> {
   private val catchCallbacks: MutableList<(Any?) -> Any?> = mutableListOf()
 
 
+  // Callback Wrapper
   private fun cW(callback: (Any?) -> Any?, reject: (Any?) -> Unit): (Any?) -> Any? {
     return fun(data: Any?): Any? {
       try {
         return callback(data)
-      } catch (error: Error) {
+      } catch (error: Throwable) {
         reject(error)
       }
 
@@ -148,28 +151,22 @@ class Promise<T> {
   }
 
   private fun invokePendingThenCallbacks() {
-//    this.setTimeout({
-    this.thenCallbacks.forEach({
-      try {
-        it(this.result as T?)
-      } catch (error: Error) {
-        this.reject(error)
-      }
+    this.setTimeout({
+      this.thenCallbacks.forEach({ it(this.result as T?) })
     })
-//    })
   }
 
   private fun invokePendingCatchCallbacks() {
-//    this.setTimeout({
-    this.catchCallbacks.forEach({ it(this.result) })
-//    })
+    this.setTimeout({
+      this.catchCallbacks.forEach({ it(this.result) })
+    })
   }
 
-  private fun setTimeout(callback: () -> Any?, time: Long = 0): Timer {
-    val timer = Timer()
-    timer.schedule(time) { callback() }
+  private fun setTimeout(callback: () -> Any?, time: Long = 0) {
+    val handler = Handler(Looper.getMainLooper())
+    val runnable = Runnable({ callback() })
 
-    return timer
+    handler.postDelayed(runnable, time)
   }
 
 }
