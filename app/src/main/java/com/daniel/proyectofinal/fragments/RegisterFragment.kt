@@ -49,7 +49,7 @@ class RegisterFragment : Fragment() {
 
   fun selectProfileImage() {
     this.activity.selectFile("image/*")
-    .then({ fileSystemUri ->
+    .thenP({ fileSystemUri ->
       if (fileSystemUri == null) throw Exception("No image was selected")
 
       this.activity.uploadFile(fileSystemUri, "images/profile - ${Calendar.getInstance().timeInMillis}")

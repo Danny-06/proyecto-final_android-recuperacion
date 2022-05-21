@@ -5,11 +5,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.daniel.proyectofinal.MainActivity
 import com.daniel.proyectofinal.R
 import com.daniel.proyectofinal.classes.RecyclerViewAdapter
 import com.daniel.proyectofinal.databinding.FragmentRecipesBinding
 import com.daniel.proyectofinal.models.Recipe
+import com.daniel.proyectofinal.models.User
 import java.util.ArrayList
 
 
@@ -17,6 +20,8 @@ class RecipesFragment : Fragment() {
 
   private lateinit var binding: FragmentRecipesBinding
   private lateinit var activity: MainActivity
+
+  private lateinit var user: User
 
   private lateinit var adapter: RecyclerViewAdapter<Recipe>
 
@@ -33,14 +38,25 @@ class RecipesFragment : Fragment() {
     this.binding.addRecipe.setOnClickListener {
       this.activity.onSignOut()
     }
+
+    this.activity.getUser()
+    .thenP({
+      this.user = it
+      this.activity.getAllRecipes()
+    })
+    .then({
+      this.displayRecipes(it)
+    })
   }
 
-  private fun displayRecipes() {
-    this.activity.getAllRecipes()
-    .then<Unit>({ recipes ->
-      recipes as ArrayList
-      this.binding.recipesRecycler.adapter = RecyclerViewAdapter(R.layout.item_recipe, recipes)
-    })
+  private fun displayRecipes(recipes: MutableList<Recipe>) {
+    this.adapter = RecyclerViewAdapter(R.layout.item_recipe, recipes as ArrayList)
+    this.binding.recipesRecycler.adapter = this.adapter
+    this.binding.recipesRecycler.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
+
+    this.adapter.setOnItemClickListener { view, recipe, index ->
+
+    }
   }
 
 }

@@ -32,13 +32,17 @@ class Promise<T> {
     }
   }
 
-  fun <S>then(onFulfilled: (T?) -> S?, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<S?> {
+  fun <S>thenP(onFulfilled: (T) -> Promise<S>, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<S> {
+    return this.then(onFulfilled as (T) -> S, onRejected)
+  }
+
+  fun <S>then(onFulfilled: (T) -> S, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<S> {
 
     if (this.state != Promise.States.PENDING)
       return Promise({ resolve, reject ->
 
         val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any?, reject)
-        val onRejectedWrapper  = this.cW(onRejected as (Any?) -> Any?, reject)
+        val onRejectedWrapper  = this.cW(onRejected, reject)
 
         if (this.state == Promise.States.FULFILLED) {
           val value = onFulfilledWrapper(this.result as T?)
@@ -58,7 +62,7 @@ class Promise<T> {
 
     return Promise({ resolve, reject ->
       val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any?, reject)
-      val onRejectedWrapper  = this.cW(onRejected as (Any?) -> Any?, reject)
+      val onRejectedWrapper  = this.cW(onRejected, reject)
 
       this.thenCallbacks.add({ resolve(onFulfilledWrapper(it)) })
 
@@ -71,14 +75,14 @@ class Promise<T> {
 
   }
 
-  fun <S>catch(onRejected: (Any?) -> S?): Promise<S?> {
-    return this.then({ } as (Any?) -> S?, onRejected)
+  fun <S>catch(onRejected: (Any?) -> S): Promise<S> {
+    return this.then({ } as (Any?) -> S, onRejected)
   }
 
-  fun finally(onFinally: () -> Unit): Promise<T?> {
-    this.then<T>(onFinally as (T?) -> T?, onFinally as (Any?) -> T?)
+  fun finally(onFinally: () -> Unit): Promise<T> {
+    this.then<T>(onFinally as (T) -> T, onFinally as (Any?) -> T)
 
-    return Promise.resolve(this) as Promise<T?>
+    return Promise.resolve(this) as Promise<T>
   }
 
   private var isResolveRejectInvoked = false
