@@ -79,6 +79,10 @@ class Promise<T> {
     return this.then({ } as (Any?) -> S, onRejected)
   }
 
+  fun <S>catchP(onRejected: (Any?) -> Promise<S>): Promise<S> {
+    return this.then({ } as (Any?) -> S, onRejected)
+  }
+
   fun finally(onFinally: () -> Unit): Promise<T> {
     this.then<T>(onFinally as (T) -> T, onFinally as (Any?) -> T)
 

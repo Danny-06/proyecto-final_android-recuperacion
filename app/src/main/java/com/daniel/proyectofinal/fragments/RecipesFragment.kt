@@ -40,12 +40,12 @@ class RecipesFragment : Fragment() {
     }
 
     this.activity.getUser()
-    .thenP({
-      this.user = it
+    .thenP({ user ->
+      this.user = user
       this.activity.getAllRecipes()
     })
-    .then({
-      this.displayRecipes(it)
+    .then({ recipes ->
+      this.displayRecipes(recipes)
     })
   }
 
