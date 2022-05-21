@@ -5,8 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
@@ -30,8 +28,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import java.util.*
-import kotlin.concurrent.schedule
-import kotlin.concurrent.scheduleAtFixedRate
 
 
 class MainActivity : AppCompatActivity() {
@@ -82,20 +78,6 @@ class MainActivity : AppCompatActivity() {
 
   fun snackbar(message: String, duration: Int = 2000) {
     Snackbar.make(this.binding.root, message, duration).show()
-  }
-
-  fun setTimeout(callback: () -> Any?, time: Long = 0) {
-    val handler = Handler(Looper.getMainLooper())
-    val runnable = Runnable({ callback() })
-
-    handler.postDelayed(runnable, time)
-  }
-
-  fun setInterval(callback: () -> Any?, time: Long = 0): Timer {
-    val timer = Timer()
-    timer.scheduleAtFixedRate(time, time) { callback() }
-
-    return timer
   }
 
   // Launch intent to let the the user choose a file
