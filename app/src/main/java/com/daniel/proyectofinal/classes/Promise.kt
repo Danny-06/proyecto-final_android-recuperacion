@@ -36,7 +36,7 @@ class Promise<T> {
     return this.then(onFulfilled as (T) -> S, onRejected)
   }
 
-  fun <S>then(onFulfilled: (T) -> S, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<S> {
+  fun <S>then(onFulfilled: (T) -> S = { it as S }, onRejected: (Any?) -> Any? = this.defaultOnRejected): Promise<S> {
 
     if (this.state != Promise.States.PENDING)
       return Promise({ resolve, reject ->
@@ -76,18 +76,18 @@ class Promise<T> {
   }
 
   fun <S>catch(onRejected: (Any?) -> S): Promise<S> {
-    return this.then({ } as (Any?) -> S, onRejected)
+    return this.then(onRejected = onRejected)
   }
 
   fun <S>catchP(onRejected: (Any?) -> Promise<S>): Promise<S> {
-    return this.then({ } as (Any?) -> S, onRejected)
+    return this.catch(onRejected as (Any?) -> S)
   }
 
-  fun finally(onFinally: () -> Unit): Promise<T> {
-    this.then<T>(onFinally as (T) -> T, onFinally as (Any?) -> T)
-
-    return Promise.resolve(this) as Promise<T>
-  }
+//  fun finally(onFinally: () -> Unit): Promise<T> {
+//    this.then<T>(onFinally as (T) -> T, onFinally as (Any?) -> T)
+//
+//    return Promise.resolve(this) as Promise<T>
+//  }
 
   private var isResolveRejectInvoked = false
   private var state = Promise.States.PENDING
