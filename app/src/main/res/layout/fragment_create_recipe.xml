@@ -1,17 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.CreateRecipeFragment"
     tools:background="@color/MainActivityBG"
 >
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Create Recipe Fragment"
-    />
+        android:layout_height="wrap_content"
+        tools:context=".fragments.CreateRecipeFragment"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:showDividers="middle"
+        android:divider="@drawable/divider_layout"
+    >
 
-</FrameLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/recipeName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:textColorHint="@color/input_placeholder_color"
+            app:hintTextColor="@color/input_placeholder_float_color"
+            app:boxStrokeColor="@color/input_box_stroke_color"
+        >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/input_bg_color"
+                android:textColor="@color/input_color"
+                tools:text="My Recipe"
+            />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/recipeThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            tools:src="@android:drawable/sym_def_app_icon"
+            android:scaleType="centerCrop"
+        />
+
+        <Button
+            android:id="@+id/selectThumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Choose Thumbnail"
+        />
+
+    </LinearLayout>
+
+</ScrollView>

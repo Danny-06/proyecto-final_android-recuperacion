@@ -49,6 +49,8 @@ class RecipesFragment : Fragment() {
     })
   }
 
+  // Functions
+
   private fun displayRecipes(recipes: MutableList<Recipe>) {
     this.adapter = RecyclerViewAdapter(R.layout.item_recipe, recipes as ArrayList)
     this.binding.recipesRecycler.adapter = this.adapter
