@@ -80,7 +80,9 @@ class MainActivity : AppCompatActivity() {
 
   // Launch intent to let the the user choose a file
   fun selectFile(accept: String = "*/*"): Promise<Uri?> {
-    if (this.resultLauncherEventTarget != null) return Promise.reject()
+    if (this.resultLauncherEventTarget != null) {
+      return Promise.reject("Can't invoke file selector while there's one active.")
+    }
 
     val intent = Intent().apply {
       this.type = accept

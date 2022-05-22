@@ -7,5 +7,5 @@ data class Recipe(
   val name: String = "",
   val thumbnail: String = "",
   val ingredients: MutableList<String> = mutableListOf(),
-  val directions: MutableList<String> = mutableListOf()
+  val steps: MutableList<String> = mutableListOf()
 ): Serializable
