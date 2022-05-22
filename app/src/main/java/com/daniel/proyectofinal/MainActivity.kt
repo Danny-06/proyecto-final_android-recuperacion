@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   // Launch intent to let the the user choose a file
-  fun selectFile(accept: String = "*/*"): Promise<Uri> {
+  fun selectFile(accept: String = "*/*"): Promise<Uri?> {
     if (this.resultLauncherEventTarget != null) return Promise.reject()
 
     val intent = Intent().apply {
