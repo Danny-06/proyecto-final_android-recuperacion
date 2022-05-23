@@ -54,6 +54,11 @@ class MainActivity : AppCompatActivity() {
     this.resultLauncherEventTarget = null
   }
 
+  interface RecipeWithUserData {
+    val user: User
+    val recipe: Recipe
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -187,11 +192,12 @@ class MainActivity : AppCompatActivity() {
   }
 
   // Recipes from all of the users
-  fun getAllRecipes(): Promise<MutableList<Recipe>> {
+
+  fun getAllRecipes(): Promise<MutableList<RecipeWithUserData>> {
     return Promise({ resolve, reject ->
 
       var userRecipeCounter = 0
-      val recipes: MutableList<Recipe> = mutableListOf()
+      val recipes: MutableList<RecipeWithUserData> = mutableListOf()
 
       this.getUsers()
       .then({ users ->
@@ -199,7 +205,15 @@ class MainActivity : AppCompatActivity() {
         users.forEach { user ->
           this.getRecipes("${this.usersPath}/${user.id}/recipes")
           .then({ userRecipes ->
-            recipes.addAll(userRecipes as Collection<Recipe>)
+            userRecipes.forEach { recipe ->
+              val recipeWithUserData = object: RecipeWithUserData {
+                override val user = user
+                override val recipe = recipe
+              }
+
+              recipes.add(recipeWithUserData)
+            }
+
             userRecipeCounter++
 
             if (userRecipeCounter == users.size) resolve(recipes)
@@ -210,6 +224,30 @@ class MainActivity : AppCompatActivity() {
 
     })
   }
+
+//  fun getAllRecipes(): Promise<MutableList<Recipe>> {
+//    return Promise({ resolve, reject ->
+//
+//      var userRecipeCounter = 0
+//      val recipes: MutableList<Recipe> = mutableListOf()
+//
+//      this.getUsers()
+//      .then({ users ->
+//
+//        users.forEach { user ->
+//          this.getRecipes("${this.usersPath}/${user.id}/recipes")
+//          .then({ userRecipes ->
+//            recipes.addAll(userRecipes as Collection<Recipe>)
+//            userRecipeCounter++
+//
+//            if (userRecipeCounter == users.size) resolve(recipes)
+//          })
+//        }
+//
+//      })
+//
+//    })
+//  }
 
   fun addRecipe(recipe: Recipe): GoogleTask<DocumentReference> {
     return this.db.collection(this.userRecipesPath).add(recipe)
