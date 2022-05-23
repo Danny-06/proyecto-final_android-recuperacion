@@ -1,100 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".fragments.CreateRecipeFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="@color/MainActivityBG"
 >
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".fragments.CreateRecipeFragment"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:showDividers="middle"
-        android:divider="@drawable/divider_layout"
+        android:layout_height="match_parent"
     >
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/recipeNameInput"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name"
-            android:textColorHint="@color/input_placeholder_color"
-            app:hintTextColor="@color/input_placeholder_float_color"
-            app:boxStrokeColor="@color/input_box_stroke_color"
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="100dp"
+            android:showDividers="middle"
+            android:divider="@drawable/divider_layout"
         >
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/input_bg_color"
-                android:textColor="@color/input_color"
-                tools:text="My Recipe"
+                android:text="Create Recipe"
+                android:textSize="30dp"
+                android:layout_gravity="center"
             />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <ImageView
-            android:id="@+id/recipeThumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/image_placeholder"
-            android:scaleType="centerCrop"
-        />
-
-        <Button
-            android:id="@+id/selectThumbnailBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Choose Thumbnail"
-        />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ingredientsInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Ingredients"
-            android:textColorHint="@color/input_placeholder_color"
-            app:hintTextColor="@color/input_placeholder_float_color"
-            app:boxStrokeColor="@color/input_box_stroke_color"
-        >
-
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/recipeNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/input_bg_color"
-                android:textColor="@color/input_color"
-                tools:text="- Ingredient 1\n- Ingredient 2\n- Ingredient 3"
+                android:hint="Name"
+                android:textColorHint="@color/input_placeholder_color"
+                app:hintTextColor="@color/input_placeholder_float_color"
+                app:boxStrokeColor="@color/input_box_stroke_color"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/input_bg_color"
+                    android:textColor="@color/input_color"
+                    tools:text="My Recipe"
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/recipeThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/image_placeholder"
+                android:scaleType="centerCrop"
             />
 
-        </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/selectThumbnailBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Choose Thumbnail"
+            />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/stepsInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Steps"
-            android:textColorHint="@color/input_placeholder_color"
-            app:hintTextColor="@color/input_placeholder_float_color"
-            app:boxStrokeColor="@color/input_box_stroke_color"
-        >
-
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ingredientsInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/input_bg_color"
-                android:textColor="@color/input_color"
-                tools:text="- Step 1\n- Step 2\n- Step 3"
-            />
+                android:hint="Ingredients"
+                android:textColorHint="@color/input_placeholder_color"
+                app:hintTextColor="@color/input_placeholder_float_color"
+                app:boxStrokeColor="@color/input_box_stroke_color"
+            >
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/input_bg_color"
+                    android:textColor="@color/input_color"
+                    tools:text="- Ingredient 1\n- Ingredient 2\n- Ingredient 3"
+                />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/stepsInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Steps"
+                android:textColorHint="@color/input_placeholder_color"
+                app:hintTextColor="@color/input_placeholder_float_color"
+                app:boxStrokeColor="@color/input_box_stroke_color"
+            >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/input_bg_color"
+                    android:textColor="@color/input_color"
+                    tools:text="- Step 1\n- Step 2\n- Step 3"
+                />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
 
-    </LinearLayout>
+        </LinearLayout>
 
-</ScrollView>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/createRecipeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_baseline_check_24"
+    />
+
+</FrameLayout>

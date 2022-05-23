@@ -37,7 +37,7 @@ class CreateRecipeFragment : Fragment() {
       })
       .then({ imageFirebaseUri ->
         this.recipe = this.recipe.copy(thumbnail = imageFirebaseUri.toString())
-        Picasso.get().load(imageFirebaseUri).into(this.binding.recipeThumbnail)
+        Picasso.get().load(this.recipe.thumbnail).into(this.binding.recipeThumbnail)
       })
     }
   }
