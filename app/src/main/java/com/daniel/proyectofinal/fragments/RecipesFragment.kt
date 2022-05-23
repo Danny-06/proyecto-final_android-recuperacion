@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daniel.proyectofinal.MainActivity
 import com.daniel.proyectofinal.R
+import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.classes.RecyclerViewAdapter
+import com.daniel.proyectofinal.classes.setInterval
 import com.daniel.proyectofinal.databinding.FragmentRecipesBinding
 import com.daniel.proyectofinal.models.Recipe
 import com.daniel.proyectofinal.models.User
@@ -36,11 +38,15 @@ class RecipesFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     this.binding.addRecipe.setOnClickListener {
-      this.activity.onSignOut()
+      this.activity.goToFragment(CreateRecipeFragment())
     }
 
     this.activity.getUser()
     .thenP({ user ->
+      if (user == null) {
+        return@thenP Promise.reject()
+      }
+
       this.user = user
       this.activity.getAllRecipes()
     })

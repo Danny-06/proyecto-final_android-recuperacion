@@ -19,7 +19,7 @@
     >
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/recipeName"
+            android:id="@+id/recipeNameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Name"
@@ -42,17 +42,58 @@
             android:id="@+id/recipeThumbnail"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            tools:src="@android:drawable/sym_def_app_icon"
+            android:src="@drawable/image_placeholder"
             android:scaleType="centerCrop"
         />
 
         <Button
-            android:id="@+id/selectThumbnail"
+            android:id="@+id/selectThumbnailBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Choose Thumbnail"
         />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/ingredientsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ingredients"
+            android:textColorHint="@color/input_placeholder_color"
+            app:hintTextColor="@color/input_placeholder_float_color"
+            app:boxStrokeColor="@color/input_box_stroke_color"
+        >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/input_bg_color"
+                android:textColor="@color/input_color"
+                tools:text="- Ingredient 1\n- Ingredient 2\n- Ingredient 3"
+            />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/stepsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Steps"
+            android:textColorHint="@color/input_placeholder_color"
+            app:hintTextColor="@color/input_placeholder_float_color"
+            app:boxStrokeColor="@color/input_box_stroke_color"
+        >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/input_bg_color"
+                android:textColor="@color/input_color"
+                tools:text="- Step 1\n- Step 2\n- Step 3"
+            />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
 
     </LinearLayout>
 

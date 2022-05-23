@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.daniel.proyectofinal.MainActivity
 import com.daniel.proyectofinal.classes.Promise
+import com.daniel.proyectofinal.classes.setInterval
 import com.daniel.proyectofinal.databinding.FragmentRegisterBinding
 import com.daniel.proyectofinal.models.User
 import com.squareup.picasso.Picasso
@@ -50,8 +51,6 @@ class RegisterFragment : Fragment() {
   fun selectProfileImage() {
     this.activity.selectFile("image/*")
     .thenP({ fileSystemUri ->
-      if (fileSystemUri == null) throw Exception("No image was selected")
-
       this.activity.uploadFile(fileSystemUri, "images/profile - ${Calendar.getInstance().timeInMillis}")
     })
     .then({ imgUri ->

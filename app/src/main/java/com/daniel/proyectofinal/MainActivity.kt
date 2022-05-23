@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   // Launch intent to let the the user choose a file
-  fun selectFile(accept: String = "*/*"): Promise<Uri?> {
+  fun selectFile(accept: String = "*/*"): Promise<Uri> {
     if (this.resultLauncherEventTarget != null) {
       return Promise.reject("Can't invoke file selector while there's one active.")
     }
@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
     this.toolbar.profileImageParent.visibility = View.INVISIBLE
   }
 
-  fun getUser(): Promise<User> {
+  fun getUser(): Promise<User?> {
     return Promise({ resolve, reject ->
 
       this.db.document(this.userPath).get()
@@ -196,7 +196,7 @@ class MainActivity : AppCompatActivity() {
       this.getUsers()
       .then({ users ->
 
-        users!!.forEach { user ->
+        users.forEach { user ->
           this.getRecipes("${this.usersPath}/${user.id}/recipes")
           .then({ userRecipes ->
             recipes.addAll(userRecipes as Collection<Recipe>)
