@@ -12,16 +12,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="0dp"
     >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Recipes"
+            android:text="All Recipes"
             android:layout_gravity="center"
             android:textSize="40sp"
             android:layout_marginVertical="20dp"
+        />
+
+        <ImageView
+            android:id="@+id/noRecipesMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/empty_list_dark"
+            android:scaleType="centerCrop"
+            android:layout_weight="1"
         />
 
         <androidx.recyclerview.widget.RecyclerView

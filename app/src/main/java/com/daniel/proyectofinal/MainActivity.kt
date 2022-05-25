@@ -71,7 +71,11 @@ class MainActivity : AppCompatActivity() {
     if (this.fireAuth.currentUser == null)
       this.goToFragment(RegisterFragment())
     else
-      this.goToFragment(RecipesFragment())
+      this.onRegisterOrLogin()
+  }
+
+  override fun onBackPressed() {
+    // super.onBackPressed()
   }
 
 

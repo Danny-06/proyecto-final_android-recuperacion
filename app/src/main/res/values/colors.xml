@@ -8,7 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="MainActivityBG">#222</color>
+    <color name="MainActivityBG">#191919</color>
 
     <color name="input_color">#FFF</color>
     <color name="input_placeholder_color">#AAA</color>

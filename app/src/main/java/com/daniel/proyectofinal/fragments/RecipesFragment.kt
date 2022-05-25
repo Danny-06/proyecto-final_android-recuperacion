@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daniel.proyectofinal.MainActivity
@@ -54,7 +55,12 @@ class RecipesFragment : Fragment() {
       this.activity.getAllRecipes()
     })
     .then({ recipes ->
-      this.displayRecipes(recipes)
+      if (recipes.size != 0)
+        this.displayRecipes(recipes)
+      else {
+        this.binding.recipesRecycler.isVisible = false
+        this.binding.noRecipesMessage.isVisible = true
+      }
     })
   }
 
@@ -82,7 +88,10 @@ class RecipesFragment : Fragment() {
         else
           Html.fromHtml("<u>Author:</u> <i>${userName}</i>", Html.FROM_HTML_MODE_COMPACT)
 
-      Picasso.get().load(recipeThumbnail).into(binding.thumbnail)
+      if (recipeThumbnail.isNotEmpty())
+        Picasso.get().load(recipeThumbnail).into(binding.thumbnail)
+      else
+        binding.thumbnail.setImageResource(R.drawable.image_placeholder)
     }
   }
 
