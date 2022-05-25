@@ -1,6 +1,5 @@
 package com.daniel.proyectofinal
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +23,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
@@ -40,8 +40,9 @@ class MainActivity : AppCompatActivity() {
   val storage = FirebaseStorage.getInstance().reference
 
   private val usersPath = "users"
+  private val recipesPath = "recipes"
   private val userPath get() = "${this.usersPath}/${this.fireAuth.uid}"
-  private val userRecipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/recipes"
+  private val userRecipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/${this.recipesPath}"
 
   private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
 
@@ -178,6 +179,22 @@ class MainActivity : AppCompatActivity() {
     return this.db.document(userPath).set(user)
   }
 
+  fun getRecipe(user: User, recipeId: String): Promise<Recipe> {
+    return Promise({ resolve, reject ->
+      this.db
+      .document("${this.usersPath}/${user.id}/${this.recipesPath}/${recipeId}")
+      .get()
+      .addOnFailureListener(reject)
+      .addOnSuccessListener {
+        val recipe = it.toObject(Recipe::class.java)
+        if (recipe != null)
+          resolve(recipe)
+        else
+          reject(Unit)
+      }
+    })
+  }
+
   fun getRecipes(): Promise<MutableList<Recipe>> {
     return this.getRecipes(this.userRecipesPath)
   }
@@ -207,7 +224,7 @@ class MainActivity : AppCompatActivity() {
       .then({ users ->
 
         users.forEach { user ->
-          this.getRecipes("${this.usersPath}/${user.id}/recipes")
+          this.getRecipes("${this.usersPath}/${user.id}/${this.recipesPath}")
           .then({ userRecipes ->
             userRecipes.forEach { recipe ->
               val recipeWithUserData = object: RecipeWithUserData {
@@ -239,7 +256,7 @@ class MainActivity : AppCompatActivity() {
 //      .then({ users ->
 //
 //        users.forEach { user ->
-//          this.getRecipes("${this.usersPath}/${user.id}/recipes")
+//          this.getRecipes("${this.usersPath}/${user.id}/${this.recipesPath}")
 //          .then({ userRecipes ->
 //            recipes.addAll(userRecipes as Collection<Recipe>)
 //            userRecipeCounter++

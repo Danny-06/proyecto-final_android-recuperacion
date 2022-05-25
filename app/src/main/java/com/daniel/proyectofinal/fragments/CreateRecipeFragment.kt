@@ -48,6 +48,21 @@ class CreateRecipeFragment : Fragment() {
     val ingredients = this.binding.ingredientsInput.editText?.text.toString()
     val steps       = this.binding.stepsInput.editText?.text.toString()
 
+    if (recipeName.isEmpty()) {
+      this.activity.snackbar("Recipe name field cannot be empty")
+      return
+    }
+
+    if (ingredients.isEmpty()) {
+      this.activity.snackbar("Ingredients field cannot be empty")
+      return
+    }
+
+    if (steps.isEmpty()) {
+      this.activity.snackbar("Steps field cannot be empty")
+      return
+    }
+
     this.recipe = this.recipe.copy(name = recipeName, ingredients = ingredients, steps = steps)
 
     this.activity.addRecipe(this.recipe)

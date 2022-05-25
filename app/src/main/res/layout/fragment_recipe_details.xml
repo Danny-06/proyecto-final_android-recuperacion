@@ -8,9 +8,95 @@
     tools:background="@color/MainActivityBG"
 >
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Recipe Details Fragment" />
+    >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:showDividers="middle"
+            android:divider="@drawable/divider_layout"
+        >
+
+            <TextView
+                android:id="@+id/recipeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Recipe Name"
+                android:textSize="30sp"
+                android:layout_gravity="center"
+            />
+
+            <ImageView
+                android:id="@+id/recipeThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                tools:src="@drawable/image_placeholder"
+                android:scaleType="centerCrop"
+            />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+            >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Ingredients"
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Steps"
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+            >
+
+                <TextView
+                    android:id="@+id/ingredients"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    tools:text="...\n...\n...\n..."
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    tools:gravity="center"
+                />
+
+                <TextView
+                    android:id="@+id/steps"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    tools:text="...\n...\n...\n..."
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    tools:gravity="center"
+                />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </FrameLayout>

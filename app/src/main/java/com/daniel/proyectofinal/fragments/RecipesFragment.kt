@@ -2,6 +2,7 @@ package com.daniel.proyectofinal.fragments
 
 import android.os.Bundle
 import android.text.Html
+import android.text.Spanned
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -71,7 +72,11 @@ class RecipesFragment : Fragment() {
     this.binding.recipesRecycler.adapter = this.adapter
     this.binding.recipesRecycler.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
 
-    this.adapter.setOnItemClickListener { view, recipe, index ->
+    this.adapter.setOnItemClickListener { view, recipeWithUserData, index ->
+
+      this.activity.goToFragment(RecipeDetailsFragment(), Bundle().apply {
+        this.putString("recipeID", recipeWithUserData.recipe.id)
+      })
 
     }
     this.adapter.setOnBindViewHolderListener { view, recipeWithUserData, index ->
@@ -81,18 +86,27 @@ class RecipesFragment : Fragment() {
       val recipeName = recipeWithUserData.recipe.name
       val recipeThumbnail = recipeWithUserData.recipe.thumbnail
 
-      binding.name.text = recipeName
+      binding.name.text =
+        if (recipeName.isNotEmpty())
+          recipeName
+        else
+          this.getHTMLFromString("<i>NO NAME WAS FOUND</i>")
+
       binding.author.text =
         if (this.user.name == userName)
-          Html.fromHtml("<b><i><u>Own Recipe</u></i></b>", Html.FROM_HTML_MODE_COMPACT)
+          this.getHTMLFromString("<b><i><u>Own Recipe</u></i></b>")
         else
-          Html.fromHtml("<u>Author:</u> <i>${userName}</i>", Html.FROM_HTML_MODE_COMPACT)
+          this.getHTMLFromString("<u>Author:</u> <i>${userName}</i>")
 
       if (recipeThumbnail.isNotEmpty())
         Picasso.get().load(recipeThumbnail).into(binding.thumbnail)
       else
         binding.thumbnail.setImageResource(R.drawable.image_placeholder)
     }
+  }
+
+  private fun getHTMLFromString(text: String): Spanned {
+    return Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
   }
 
 }
