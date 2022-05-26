@@ -38,7 +38,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:scaleType="centerCrop"
-            tools:src="@android:drawable/sym_def_app_icon"
+            tools:src="@drawable/user_placeholder"
         />
 
     </androidx.cardview.widget.CardView>

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daniel.proyectofinal.MainActivity
@@ -43,7 +44,7 @@ class RecipesFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     this.binding.addRecipe.setOnClickListener {
-      this.activity.goToFragment(CreateRecipeFragment())
+      this.goToCreateRecipe()
     }
 
     this.activity.getUser()
@@ -74,7 +75,7 @@ class RecipesFragment : Fragment() {
 
     this.adapter.setOnItemClickListener { view, recipeWithUserData, index ->
 
-      this.activity.goToFragment(RecipeDetailsFragment(), Bundle().apply {
+      this.goToRecipeDetails(Bundle().apply {
         this.putString("recipeID", recipeWithUserData.recipe.id)
       })
 
@@ -107,6 +108,24 @@ class RecipesFragment : Fragment() {
 
   private fun getHTMLFromString(text: String): Spanned {
     return Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
+  }
+
+  private fun goToCreateRecipe(bundle: Bundle? = null) {
+    NavHostFragment
+    .findNavController(this)
+    .navigate(R.id.action_recipesFragment_to_createRecipeFragment, bundle)
+  }
+
+  private fun goToProfile(bundle: Bundle? = null) {
+    NavHostFragment
+    .findNavController(this)
+    .navigate(R.id.action_recipesFragment_to_profileFragment, bundle)
+  }
+
+  private fun goToRecipeDetails(bundle: Bundle? = null) {
+    NavHostFragment
+    .findNavController(this)
+    .navigate(R.id.action_recipesFragment_to_recipeDetailsFragment, bundle)
   }
 
 }

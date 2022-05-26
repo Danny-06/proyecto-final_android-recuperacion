@@ -8,11 +8,15 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
+import androidx.navigation.fragment.NavHostFragment
+import androidx.viewpager2.adapter.FragmentViewHolder
 import com.daniel.proyectofinal.classes.CustomEventTarget
 import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.databinding.ActivityMainBinding
 import com.daniel.proyectofinal.databinding.ToolbarBinding
 import com.daniel.proyectofinal.fragments.LoginFragment
+import com.daniel.proyectofinal.fragments.ProfileFragment
 import com.daniel.proyectofinal.fragments.RecipesFragment
 import com.daniel.proyectofinal.fragments.RegisterFragment
 import com.daniel.proyectofinal.models.Recipe
@@ -23,7 +27,6 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
@@ -43,6 +46,8 @@ class MainActivity : AppCompatActivity() {
   private val recipesPath = "recipes"
   private val userPath get() = "${this.usersPath}/${this.fireAuth.uid}"
   private val userRecipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/${this.recipesPath}"
+
+  private var currentFragment: Fragment? = null
 
   private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
 
@@ -68,6 +73,10 @@ class MainActivity : AppCompatActivity() {
 
     this.toolbar = this.binding.toolbar
 
+    this.toolbar.profileImage.setOnClickListener {
+      this.currentFragment = this.goToFragment(ProfileFragment())
+    }
+
     // Check if user is logged in the application
     if (this.fireAuth.currentUser == null)
       this.goToFragment(RegisterFragment())
@@ -76,7 +85,20 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onBackPressed() {
-    // super.onBackPressed()
+    if (this.currentFragment is ProfileFragment) {
+      val fragment = this.supportFragmentManager.fragments[0]
+      this.currentFragment = fragment
+
+      val navController = NavHostFragment.findNavController(fragment)
+      navController.popBackStack(R.id.recipesFragment, true)
+      navController.popBackStack(R.id.createRecipeFragment, true)
+      navController.popBackStack(R.id.recipeDetailsFragment, true)
+
+      navController.navigate(R.id.recipesFragment)
+    } else {
+      this.currentFragment = null
+      super.onBackPressed()
+    }
   }
 
 
@@ -308,12 +330,14 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
-  fun goToFragment(fragment: Fragment, bundle: Bundle? = null) {
+  fun goToFragment(fragment: Fragment, bundle: Bundle? = null): Fragment {
     fragment.arguments = bundle
 
     this.supportFragmentManager.beginTransaction()
     .replace(R.id.nav_host_fragment_content_main, fragment)
     .commit()
+
+    return fragment
   }
 
 }

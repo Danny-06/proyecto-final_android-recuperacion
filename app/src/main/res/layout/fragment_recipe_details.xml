@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.RecipeDetailsFragment"
-    tools:background="@color/MainActivityBG"
+    android:background="@color/MainActivityBG"
 >
 
     <ScrollView
