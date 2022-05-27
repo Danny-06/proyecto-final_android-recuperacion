@@ -43,6 +43,15 @@ class RecipesFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    val fragment = this.activity.supportFragmentManager.fragments[0]
+    this.activity.currentFragment = fragment
+
+    val navController = NavHostFragment.findNavController(fragment)
+
+    // Clear navigation stack
+    navController.popBackStack(R.id.createRecipeFragment, true)
+    navController.popBackStack(R.id.recipeDetailsFragment, true)
+
     this.binding.addRecipe.setOnClickListener {
       this.goToCreateRecipe()
     }
@@ -54,11 +63,19 @@ class RecipesFragment : Fragment() {
       }
 
       this.user = user
-      this.activity.getAllRecipes()
+      if (this.arguments?.getBoolean("own-recipes") == true) {
+        this.binding.title.text = "Your Recipes"
+        this.activity.getRecipesWithUserData(this.user)
+      }
+      else
+        this.activity.getAllRecipes()
     })
     .then({ recipes ->
-      if (recipes.size != 0)
+      if (recipes.size != 0) {
+        this.binding.recipesRecycler.isVisible = true
+        this.binding.noRecipesMessage.isVisible = false
         this.displayRecipes(recipes)
+      }
       else {
         this.binding.recipesRecycler.isVisible = false
         this.binding.noRecipesMessage.isVisible = true
@@ -76,6 +93,7 @@ class RecipesFragment : Fragment() {
     this.adapter.setOnItemClickListener { view, recipeWithUserData, index ->
 
       this.goToRecipeDetails(Bundle().apply {
+        this.putString("userID", recipeWithUserData.user.id)
         this.putString("recipeID", recipeWithUserData.recipe.id)
       })
 
@@ -97,7 +115,7 @@ class RecipesFragment : Fragment() {
         if (this.user.name == userName)
           this.getHTMLFromString("<b><i><u>Own Recipe</u></i></b>")
         else
-          this.getHTMLFromString("<u>Author:</u> <i>${userName}</i>")
+          this.getHTMLFromString("<b><u>Author</u>:</b> <i>${userName}</i>")
 
       if (recipeThumbnail.isNotEmpty())
         Picasso.get().load(recipeThumbnail).into(binding.thumbnail)

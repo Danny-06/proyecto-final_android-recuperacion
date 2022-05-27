@@ -8,9 +8,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.fragment.NavHostFragment
-import androidx.viewpager2.adapter.FragmentViewHolder
 import com.daniel.proyectofinal.classes.CustomEventTarget
 import com.daniel.proyectofinal.classes.Promise
 import com.daniel.proyectofinal.databinding.ActivityMainBinding
@@ -36,7 +34,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
-  private lateinit var toolbar: ToolbarBinding
+  lateinit var toolbar: ToolbarBinding
 
   val fireAuth = Firebase.auth
   val db = Firebase.firestore
@@ -47,7 +45,7 @@ class MainActivity : AppCompatActivity() {
   private val userPath get() = "${this.usersPath}/${this.fireAuth.uid}"
   private val userRecipesPath get() = "${this.usersPath}/${this.fireAuth.uid}/${this.recipesPath}"
 
-  private var currentFragment: Fragment? = null
+  var currentFragment: Fragment? = null
 
   private var resultLauncherEventTarget: CustomEventTarget<Uri>? = null
 
@@ -90,6 +88,8 @@ class MainActivity : AppCompatActivity() {
       this.currentFragment = fragment
 
       val navController = NavHostFragment.findNavController(fragment)
+
+      // Clear navigation stack
       navController.popBackStack(R.id.recipesFragment, true)
       navController.popBackStack(R.id.createRecipeFragment, true)
       navController.popBackStack(R.id.recipeDetailsFragment, true)
@@ -234,6 +234,26 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
+  fun getRecipesWithUserData(user: User): Promise<MutableList<RecipeWithUserData>> {
+    return Promise({ resolve, reject ->
+      val recipesWithUserData = mutableListOf<RecipeWithUserData>()
+
+      this.getRecipes("${this.usersPath}/${user.id}/${this.recipesPath}")
+      .then({ recipes ->
+        recipes.forEach {
+          val recipeWithUserData = object: RecipeWithUserData {
+            override val user = user
+            override val recipe = it
+          }
+
+          recipesWithUserData.add(recipeWithUserData)
+        }
+
+        resolve(recipesWithUserData)
+      })
+    })
+  }
+
   // Recipes from all of the users
 
   fun getAllRecipes(): Promise<MutableList<RecipeWithUserData>> {
@@ -310,11 +330,15 @@ class MainActivity : AppCompatActivity() {
     return this.db.document(recipePath).delete()
   }
 
-  fun changeProfileImage(user: User, image: Uri): Promise<Any?> {
-    return this.uploadFile(image, "images/profile - ${Calendar.getInstance().timeInMillis}")
-    .then({
-      val copyUser = user.copy(image = it.toString())
-      this.updateUser(copyUser)
+  fun changeProfileImage(user: User, image: Uri): Promise<Uri> {
+    return Promise({ resolve, reject ->
+      this.uploadFile(image, "images/profile - ${Calendar.getInstance().timeInMillis}")
+      .then({
+        val copyUser = user.copy(image = it.toString())
+        this.updateUser(copyUser)
+        resolve(it)
+      })
+      .catch(reject)
     })
   }
 

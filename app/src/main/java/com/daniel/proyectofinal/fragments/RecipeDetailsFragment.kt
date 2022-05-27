@@ -76,16 +76,17 @@ class RecipeDetailsFragment : Fragment() {
   private fun getRecipeFromArguments(): Promise<Recipe> {
     return Promise({ resolve, reject ->
       this.arguments?.apply {
+        val userID   = this.getString("userID")
         val recipeID = this.getString("recipeID")
 
-        if (recipeID == null) {
+        if (userID == null || recipeID == null) {
           this@RecipeDetailsFragment.handleRecipeNotFound()
           reject("No recipe found")
           return@apply
         }
 
         this@RecipeDetailsFragment
-        .activity.getRecipe(this@RecipeDetailsFragment.user, recipeID)
+        .activity.getRecipe(User(id = userID), recipeID)
         .then({ recipe -> resolve(recipe) })
         .catch(reject)
       }

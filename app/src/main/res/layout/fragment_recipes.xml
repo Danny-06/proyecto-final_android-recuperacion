@@ -17,6 +17,7 @@
     >
 
         <TextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="All Recipes"
@@ -32,13 +33,17 @@
             android:src="@drawable/empty_list_dark"
             android:scaleType="centerCrop"
             android:layout_weight="1"
+            android:visibility="gone"
         />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recipesRecycler"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_weight="1"
+            android:visibility="gone"
+            tools:visibility="visible"
         />
 
     </LinearLayout>

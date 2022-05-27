@@ -43,6 +43,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
             android:background="@color/input_bg_color"
             android:textColor="@color/input_color"
             tools:text="My Name"
@@ -63,6 +64,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
             android:background="@color/input_bg_color"
             android:textColor="@color/input_color"
             tools:text="email@example.com"

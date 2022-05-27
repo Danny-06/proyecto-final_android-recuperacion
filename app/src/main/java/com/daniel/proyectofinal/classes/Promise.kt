@@ -32,16 +32,16 @@ class Promise<T> {
     }
   }
 
-  fun <S>thenP(onFulfilled: (T) -> Promise<S>, onRejected: (Any) -> Any = this.defaultOnRejected): Promise<S> {
+  fun <S>thenP(onFulfilled: (T) -> Promise<S>, onRejected: (Any?) -> Any = this.defaultOnRejected): Promise<S> {
     return this.then(onFulfilled as (T) -> S, onRejected)
   }
 
-  fun <S>then(onFulfilled: (T) -> S = { it as S }, onRejected: (Any) -> Any = this.defaultOnRejected): Promise<S> {
+  fun <S>then(onFulfilled: (T) -> S = { it as S }, onRejected: (Any?) -> Any = this.defaultOnRejected): Promise<S> {
 
     if (this.state != Promise.States.PENDING)
       return Promise({ resolve, reject ->
 
-        val onFulfilledWrapper = this.cW(onFulfilled as (Any) -> Any, reject) as(T) -> S
+        val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any, reject) as(T) -> S
         val onRejectedWrapper  = this.cW(onRejected, reject)
 
         if (this.state == Promise.States.FULFILLED) {
@@ -61,7 +61,7 @@ class Promise<T> {
       })
 
     return Promise({ resolve, reject ->
-      val onFulfilledWrapper = this.cW(onFulfilled as (Any) -> Any, reject) as (T) -> S
+      val onFulfilledWrapper = this.cW(onFulfilled as (Any?) -> Any, reject) as (T) -> S
       val onRejectedWrapper  = this.cW(onRejected, reject)
 
       this.thenCallbacks.add({ resolve(onFulfilledWrapper(it)) })
@@ -76,7 +76,7 @@ class Promise<T> {
   }
 
   fun <S>catch(onRejected: (Any) -> S): Promise<S> {
-    return this.then(onRejected = onRejected as (Any) -> Any)
+    return this.then(onRejected = onRejected as (Any?) -> Any)
   }
 
   fun <S>catchP(onRejected: (Any) -> Promise<S>): Promise<S> {
@@ -91,17 +91,17 @@ class Promise<T> {
 
   private var isResolveRejectInvoked = false
   private var state = Promise.States.PENDING
-  private var result: Any = Unit
+  private var result: Any? = Unit
 
-  private val defaultOnRejected: (Any) -> Any = { }
+  private val defaultOnRejected: (Any?) -> Any = { }
 
   private val thenCallbacks: MutableList<(T) -> Any> = mutableListOf()
-  private val catchCallbacks: MutableList<(Any) -> Any> = mutableListOf()
+  private val catchCallbacks: MutableList<(Any?) -> Any> = mutableListOf()
 
 
   // Callback Wrapper
-  private fun cW(callback: (Any) -> Any, reject: (Any) -> Unit): (Any) -> Any {
-    return fun(data: Any): Any {
+  private fun cW(callback: (Any?) -> Any, reject: (Any) -> Unit): (Any?) -> Any {
+    return fun(data: Any?): Any {
       try {
         return callback(data)
       } catch (error: Throwable) {
@@ -142,11 +142,11 @@ class Promise<T> {
 
   private fun resolve(value: T) {
     this.state = Promise.States.FULFILLED
-    this.result = value as Any
+    this.result = value
     this.invokePendingThenCallbacks()
   }
 
-  private fun reject(reason: Any) {
+  private fun reject(reason: Any?) {
     this.state = Promise.States.REJECTED
     this.result = reason
     this.invokePendingCatchCallbacks()
