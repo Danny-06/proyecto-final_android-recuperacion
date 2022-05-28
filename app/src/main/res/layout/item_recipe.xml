@@ -37,14 +37,30 @@
             android:textSize="20sp"
         />
 
-        <TextView
+        <LinearLayout
             android:paddingTop="10dp"
-            android:id="@+id/author"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="Author: Name"
-            android:textSize="20sp"
-        />
+            android:orientation="vertical"
+        >
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Author: Name"
+                android:textSize="20sp"
+            />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Date"
+                android:textSize="20sp"
+            />
+
+        </LinearLayout>
 
     </LinearLayout>
 

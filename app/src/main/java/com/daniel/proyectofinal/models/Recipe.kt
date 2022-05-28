@@ -7,5 +7,6 @@ data class Recipe(
   val name: String = "",
   val thumbnail: String = "",
   val ingredients: String = "",
-  val steps: String = ""
+  val steps: String = "",
+  val date: Long = 0
 ): Serializable

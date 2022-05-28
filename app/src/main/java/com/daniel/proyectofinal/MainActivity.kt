@@ -217,6 +217,12 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
+  fun deleteRecipe(recipeId: String, userId: String): GoogleTask<Void> {
+    val documentPath = "${this.usersPath}/${userId}/${this.recipesPath}/${recipeId}"
+
+    return this.db.document(documentPath).delete()
+  }
+
   fun getRecipes(): Promise<MutableList<Recipe>> {
     return this.getRecipes(this.userRecipesPath)
   }
@@ -288,29 +294,6 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
-//  fun getAllRecipes(): Promise<MutableList<Recipe>> {
-//    return Promise({ resolve, reject ->
-//
-//      var userRecipeCounter = 0
-//      val recipes: MutableList<Recipe> = mutableListOf()
-//
-//      this.getUsers()
-//      .then({ users ->
-//
-//        users.forEach { user ->
-//          this.getRecipes("${this.usersPath}/${user.id}/${this.recipesPath}")
-//          .then({ userRecipes ->
-//            recipes.addAll(userRecipes as Collection<Recipe>)
-//            userRecipeCounter++
-//
-//            if (userRecipeCounter == users.size) resolve(recipes)
-//          })
-//        }
-//
-//      })
-//
-//    })
-//  }
 
   fun addRecipe(recipe: Recipe): GoogleTask<DocumentReference> {
     return this.db.collection(this.userRecipesPath).add(recipe)
@@ -323,11 +306,6 @@ class MainActivity : AppCompatActivity() {
   fun updateRecipe(recipe: Recipe): GoogleTask<Void> {
     val recipePath = "${this.userRecipesPath}/${recipe.id}"
     return this.db.document(recipePath).set(recipe)
-  }
-
-  fun deleteRecipe(recipe: Recipe): GoogleTask<Void> {
-    val recipePath = "${this.userRecipesPath}/${recipe.id}"
-    return this.db.document(recipePath).delete()
   }
 
   fun changeProfileImage(user: User, image: Uri): Promise<Uri> {

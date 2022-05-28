@@ -63,7 +63,7 @@ class CreateRecipeFragment : Fragment() {
       return
     }
 
-    this.recipe = this.recipe.copy(name = recipeName, ingredients = ingredients, steps = steps)
+    this.recipe = this.recipe.copy(name = recipeName, ingredients = ingredients, steps = steps, date = Calendar.getInstance().timeInMillis)
 
     this.activity.addRecipe(this.recipe)
     .addOnFailureListener {
